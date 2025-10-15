@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controlador Financeiro Pessoal</title>
+    <!-- Cor do tema para a barra de status do navegador (PWA) -->
+    <meta name="theme-color" content="#4f46e5">
+    <!-- Link para o Manifest do PWA -->
+    <link rel="manifest" href="manifest.json">
+    <!-- Incluindo Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Incluindo a fonte Inter do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Ícones (Feather Icons) -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Estilo customizado para a fonte Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        /* Estilo para a barra de rolagem */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #a8a8a8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #888; }
+        
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        
+        @keyframes modal-in {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-animation { animation: modal-in 0.2s ease-out; }
+
+        /* Estilos para o Modal */
+        .modal-overlay {
+            transition: opacity 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <!-- Cabeçalho -->
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-gray-700">Painel Financeiro</h1>
+            <p class="text-gray-500 mt-2">Sua vida financeira organizada, mês a mês.</p>
+        </header>
+
+        <!-- Seletor de Mês e Ano e Botão Exportar -->
+        <div class="bg-white p-4 rounded-xl shadow-md mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+             <div class="flex flex-col md:flex-row items-center gap-4">
+                <label for="month-select" class="font-semibold text-gray-600">Selecione o Período:</label>
+                <div class="flex gap-4">
+                    <select id="month-select" class="p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"></select>
+                    <select id="year-select" class="p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"></select>
+                </div>
+            </div>
+            <button id="export-csv" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300 shadow-md flex items-center gap-2">
+                <i data-feather="download" class="w-4 h-4"></i>
+                Exportar CSV
+            </button>
+        </div>
+
+        <!-- Cards de Resumo -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-blue-100 text-blue-600 p-3 rounded-full"><i data-feather="dollar-sign"></i></div><div><h3 class="font-semibold text-gray-500">Saldo Final (Débito)</h3><p id="final-balance" class="text-3xl font-bold text-blue-600">R$ 0,00</p><p id="debit-summary" class="text-sm text-gray-400 mt-1">Gasto: R$ 0,00</p></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-red-100 text-red-600 p-3 rounded-full"><i data-feather="credit-card"></i></div><div><h3 class="font-semibold text-gray-500">Fatura Atual (Crédito)</h3><p id="current-bill" class="text-3xl font-bold text-red-600">R$ 0,00</p><p id="credit-summary" class="text-sm text-gray-400 mt-1">Limite usado: 0%</p></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-green-100 text-green-600 p-3 rounded-full"><i data-feather="shield"></i></div><div><h3 class="font-semibold text-gray-500">Limite Restante</h3><p id="remaining-limit" class="text-3xl font-bold text-green-600">R$ 0,00</p><p class="text-sm text-gray-400 mt-1">Disponível para compras</p></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-purple-100 text-purple-600 p-3 rounded-full"><i data-feather="bar-chart-2"></i></div><div><h3 class="font-semibold text-gray-500">Gasto Total do Mês</h3><p id="total-spent-month" class="text-3xl font-bold text-purple-600">R$ 0,00</p><p class="text-sm text-gray-400 mt-1">Débito + Crédito</p></div></div>
+        </div>
+        
+        <!-- Seção Principal -->
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <!-- Coluna Esquerda: Configurações, Formulário e Gráfico -->
+            <div class="lg:col-span-2 flex flex-col gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Configurações do Mês</h2><div class="space-y-4"><div><label for="initial-balance" class="block text-sm font-medium text-gray-600 mb-1">Saldo Inicial (Débito)</label><input type="number" id="initial-balance" placeholder="Ex: 1500,00" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="credit-limit" class="block text-sm font-medium text-gray-600 mb-1">Limite do Cartão de Crédito</label><input type="number" id="credit-limit" placeholder="Ex: 5000,00" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div></div></div>
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Adicionar Transação</h2><form id="transaction-form" class="space-y-4"><div><label for="trans-description" class="block text-sm font-medium text-gray-600 mb-1">Descrição</label><input type="text" id="trans-description" placeholder="Ex: Supermercado, Gasolina" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-value" class="block text-sm font-medium text-gray-600 mb-1">Valor</label><input type="number" id="trans-value" step="0.01" placeholder="Ex: 150,50" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-date" class="block text-sm font-medium text-gray-600 mb-1">Data</label><input type="date" id="trans-date" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-user" class="block text-sm font-medium text-gray-600 mb-1">Usuário</label><select id="trans-user" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Mãe">Mãe</option><option value="Pai">Pai</option><option value="Matheus">Matheus</option><option value="Murilo">Murilo</option><option value="Outro">Outro</option></select></div><div><label for="trans-category" class="block text-sm font-medium text-gray-600 mb-1">Categoria</label><select id="trans-category" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Moradia">Moradia</option><option value="Saúde">Saúde</option><option value="Educação">Educação</option><option value="Outros">Outros</option></select></div><div><label for="trans-type" class="block text-sm font-medium text-gray-600 mb-1">Tipo</label><select id="trans-type" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="debit">Débito</option><option value="credit">Crédito</option></select></div><div id="installments-group" class="hidden"><label for="trans-installments" class="block text-sm font-medium text-gray-600 mb-1">Nº de Parcelas (valor total)</label><input type="number" id="trans-installments" value="1" min="1" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg">Adicionar</button></form></div>
+            </div>
+             <!-- Coluna Direita: Extratos -->
+            <div class="lg:col-span-3 flex flex-col gap-8">
+                 <!-- Gráfico de Gastos -->
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in">
+                    <h2 class="text-xl font-bold mb-4 text-gray-700">Gastos por Usuário</h2>
+                    <div class="relative h-64">
+                         <canvas id="spending-chart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Extrato de Débito</h2><div id="debit-list" class="space-y-3 max-h-96 overflow-y-auto pr-2"><p class="text-gray-500 text-center py-4">Nenhuma transação de débito este mês.</p></div></div>
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Fatura do Cartão de Crédito</h2><div id="credit-list" class="space-y-3 max-h-96 overflow-y-auto pr-2"><p class="text-gray-500 text-center py-4">Nenhuma transação de crédito este mês.</p></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden modal-overlay">
+        <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md modal-animation">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Confirmar Exclusão</h3>
+            <p class="text-gray-600 mb-6">Você tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.</p>
+            <div class="flex justify-end gap-4">
+                <button id="cancel-delete" class="px-6 py-2 rounded-lg text-gray-700 bg-gray-200 hover:bg-gray-300 transition">Cancelar</button>
+                <button id="confirm-delete" class="px-6 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 transition">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Elementos da UI
+            const monthSelect = document.getElementById('month-select');
+            const yearSelect = document.getElementById('year-select');
+            const initialBalanceInput = document.getElementById('initial-balance');
+            const creditLimitInput = document.getElementById('credit-limit');
+            const transactionForm = document.getElementById('transaction-form');
+            const transTypeSelect = document.getElementById('trans-type');
+            const installmentsGroup = document.getElementById('installments-group');
+            const transDateInput = document.getElementById('trans-date');
+            const exportCsvButton = document.getElementById('export-csv');
+            const deleteModal = document.getElementById('delete-modal');
+            const cancelDeleteBtn = document.getElementById('cancel-delete');
+            const confirmDeleteBtn = document.getElementById('confirm-delete');
+
+            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            let appData = { transactions: [], monthlySettings: {} };
+            let transactionToDelete = null;
+            let spendingChart = null;
+
+            const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+            const getCurrentPeriodKey = () => `${yearSelect.value}-${monthSelect.value}`;
+
+            const populateSelectors = () => {
+                const now = new Date();
+                const currentYear = now.getFullYear();
+                const currentMonth = now.getMonth();
+                monthNames.forEach((name, index) => {
+                    const option = new Option(name, index);
+                    monthSelect.appendChild(option);
+                });
+                for (let i = currentYear - 5; i <= currentYear + 5; i++) {
+                    const option = new Option(i, i);
+                    yearSelect.appendChild(option);
+                }
+                monthSelect.value = currentMonth;
+                yearSelect.value = currentYear;
+                transDateInput.valueAsDate = now;
+            };
+
+            const saveData = () => localStorage.setItem('financialControlData', JSON.stringify(appData));
+            const loadData = () => {
+                const data = localStorage.getItem('financialControlData');
+                if (data) appData = JSON.parse(data);
+            };
+            
+            const renderUI = () => {
+                const periodKey = getCurrentPeriodKey();
+                const year = parseInt(yearSelect.value);
+                const month = parseInt(monthSelect.value);
+                
+                if (!appData.monthlySettings[periodKey]) {
+                    appData.monthlySettings[periodKey] = { initialBalance: 0, creditLimit: 0 };
+                }
+                const settings = appData.monthlySettings[periodKey];
+                initialBalanceInput.value = settings.initialBalance > 0 ? settings.initialBalance : '';
+                creditLimitInput.value = settings.creditLimit > 0 ? settings.creditLimit : '';
+
+                renderTransactions(year, month);
+                calculateAndRenderSummary(year, month);
+                updateChart(year, month);
+                feather.replace();
+            };
+
+            const renderTransactions = (year, month) => {
+                const debitList = document.getElementById('debit-list');
+                const creditList = document.getElementById('credit-list');
+                debitList.innerHTML = '';
+                creditList.innerHTML = '';
+
+                const debitTransactionsThisMonth = appData.transactions.filter(t => {
+                    const tDate = new Date(t.date + 'T00:00:00');
+                    return t.type === 'debit' && tDate.getFullYear() === year && tDate.getMonth() === month;
+                });
+                
+                const creditInstallmentsThisMonth = [];
+                appData.transactions.filter(t => t.type === 'credit').forEach(t => {
+                    const purchaseDate = new Date(t.date + 'T00:00:00');
+                    const installmentValue = t.value / t.installments.total;
+                    for (let i = 0; i < t.installments.total; i++) {
+                        const installmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + i, purchaseDate.getDate());
+                        if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) {
+                            creditInstallmentsThisMonth.push({ ...t, installmentValue, description: `${t.description} (${i + 1}/${t.installments.total})` });
+                        }
+                    }
+                });
+
+                if (debitTransactionsThisMonth.length === 0) debitList.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhuma transação de débito este mês.</p>';
+                else debitTransactionsThisMonth.forEach(t => debitList.appendChild(createTransactionElement(t)));
+
+                if (creditInstallmentsThisMonth.length === 0) creditList.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhuma transação de crédito este mês.</p>';
+                else creditInstallmentsThisMonth.forEach(t => creditList.appendChild(createTransactionElement(t)));
+            };
+            
+            const createTransactionElement = (transaction) => {
+                const value = transaction.installmentValue !== undefined ? transaction.installmentValue : transaction.value;
+                const element = document.createElement('div');
+                element.className = 'flex justify-between items-center p-3 rounded-lg border hover:bg-gray-50 transition';
+                element.innerHTML = `
+                    <div class="flex items-center gap-3"><div class="p-2 rounded-full bg-${transaction.type === 'debit' ? 'blue' : 'red'}-100 text-${transaction.type === 'debit' ? 'blue' : 'red'}-600"><i data-feather="${transaction.type === 'debit' ? 'arrow-up-circle' : 'arrow-down-circle'}" class="w-5 h-5"></i></div><div><p class="font-semibold">${transaction.description}</p><p class="text-sm text-gray-500">${transaction.user} &bull; ${transaction.category || 'Sem Categoria'}</p></div></div>
+                    <div class="text-right flex items-center gap-2"><p class="font-bold text-${transaction.type === 'debit' ? 'blue' : 'red'}-600">${formatCurrency(value)}</p><button data-id="${transaction.id}" class="delete-btn text-gray-400 hover:text-red-500 transition"><i data-feather="trash-2" class="w-4 h-4"></i></button></div>`;
+                element.querySelector('.delete-btn').addEventListener('click', () => openDeleteModal(transaction.id));
+                return element;
+            };
+
+            const calculateAndRenderSummary = (year, month) => {
+                const periodKey = `${year}-${month}`;
+                const settings = appData.monthlySettings[periodKey] || { initialBalance: 0, creditLimit: 0 };
+                
+                const debitTotal = appData.transactions.filter(t => { const tDate = new Date(t.date + 'T00:00:00'); return t.type === 'debit' && tDate.getFullYear() === year && tDate.getMonth() === month; }).reduce((sum, t) => sum + t.value, 0);
+                document.getElementById('final-balance').textContent = formatCurrency(settings.initialBalance - debitTotal);
+                document.getElementById('debit-summary').textContent = `Gasto: ${formatCurrency(debitTotal)}`;
+
+                let currentBill = 0; let totalCommitted = 0;
+                appData.transactions.filter(t => t.type === 'credit').forEach(t => {
+                    const purchaseDate = new Date(t.date + 'T00:00:00');
+                    const lastInstallmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + t.installments.total - 1, purchaseDate.getDate());
+                    if(lastInstallmentDate >= new Date(year, month, 1)) { totalCommitted += t.value; }
+                    for (let i = 0; i < t.installments.total; i++) {
+                        const installmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + i, 1);
+                        if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) { currentBill += t.value / t.installments.total; }
+                    }
+                });
+                const limitUsage = settings.creditLimit > 0 ? (totalCommitted / settings.creditLimit) * 100 : 0;
+                document.getElementById('current-bill').textContent = formatCurrency(currentBill);
+                document.getElementById('credit-summary').textContent = `Limite usado: ${limitUsage.toFixed(1)}%`;
+                document.getElementById('remaining-limit').textContent = formatCurrency(settings.creditLimit - totalCommitted);
+                document.getElementById('total-spent-month').textContent = formatCurrency(debitTotal + currentBill);
+            };
+
+            const updateChart = (year, month) => {
+                const transactionsInMonth = appData.transactions.filter(t => {
+                    const tDate = new Date(t.date + 'T00:00:00');
+                    if (t.type === 'debit') {
+                        return tDate.getFullYear() === year && tDate.getMonth() === month;
+                    }
+                    if (t.type === 'credit') {
+                        const purchaseDate = new Date(t.date + 'T00:00:00');
+                        for (let i = 0; i < t.installments.total; i++) {
+                            const installmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + i, 1);
+                            if(installmentDate.getFullYear() === year && installmentDate.getMonth() === month) return true;
+                        }
+                    }
+                    return false;
+                });
+
+                const spendingByUser = transactionsInMonth.reduce((acc, t) => {
+                    let value = 0;
+                    if (t.type === 'debit') {
+                        value = t.value;
+                    } else { // credit
+                         value = t.value / t.installments.total;
+                    }
+                    acc[t.user] = (acc[t.user] || 0) + value;
+                    return acc;
+                }, {});
+
+                const labels = Object.keys(spendingByUser);
+                const data = Object.values(spendingByUser);
+
+                const chartCtx = document.getElementById('spending-chart').getContext('2d');
+                if (spendingChart) spendingChart.destroy();
+                spendingChart = new Chart(chartCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{ label: 'Gastos por Usuário', data: data, backgroundColor: ['#3b82f6', '#ef4444', '#22c55e', '#a855f7', '#f97316'], hoverOffset: 4 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                });
+            };
+            
+            const exportToCSV = () => {
+                const year = parseInt(yearSelect.value);
+                const month = parseInt(monthSelect.value);
+                const headers = 'Data,Descrição,Usuário,Categoria,Tipo,Valor,Parcela\n';
+                const rows = appData.transactions.flatMap(t => {
+                    const purchaseDate = new Date(t.date + 'T00:00:00');
+                    if(t.type === 'debit') {
+                         if(purchaseDate.getFullYear() === year && purchaseDate.getMonth() === month) {
+                            return `"${t.date}","${t.description}","${t.user}","${t.category}","Débito","${t.value.toFixed(2)}","1/1"\n`;
+                         }
+                         return [];
+                    } else {
+                        let installmentsInMonth = [];
+                         for (let i = 0; i < t.installments.total; i++) {
+                            const installmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + i, 1);
+                            if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) {
+                                installmentsInMonth.push(`"${installmentDate.toLocaleDateString('pt-BR')}","${t.description}","${t.user}","${t.category}","Crédito","${(t.value/t.installments.total).toFixed(2)}","${i+1}/${t.installments.total}"\n`);
+                            }
+                        }
+                        return installmentsInMonth;
+                    }
+                }).join('');
+
+                const csvContent = "data:text/csv;charset=utf-8," + headers + rows;
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `extrato_${year}_${monthNames[month]}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+
+            const openDeleteModal = (id) => {
+                transactionToDelete = id;
+                deleteModal.classList.remove('hidden');
+            };
+            const closeDeleteModal = () => {
+                transactionToDelete = null;
+                deleteModal.classList.add('hidden');
+            };
+
+            // Event Listeners
+            monthSelect.addEventListener('change', renderUI);
+            yearSelect.addEventListener('change', renderUI);
+            initialBalanceInput.addEventListener('change', (e) => { appData.monthlySettings[getCurrentPeriodKey()].initialBalance = parseFloat(e.target.value) || 0; saveData(); renderUI(); });
+            creditLimitInput.addEventListener('change', (e) => { appData.monthlySettings[getCurrentPeriodKey()].creditLimit = parseFloat(e.target.value) || 0; saveData(); renderUI(); });
+            transTypeSelect.addEventListener('change', (e) => installmentsGroup.classList.toggle('hidden', e.target.value !== 'credit'));
+            transactionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newTransaction = { id: crypto.randomUUID(), description: document.getElementById('trans-description').value, value: parseFloat(document.getElementById('trans-value').value), date: document.getElementById('trans-date').value, user: document.getElementById('trans-user').value, category: document.getElementById('trans-category').value, type: document.getElementById('trans-type').value, installments: { total: parseInt(document.getElementById('trans-installments').value) || 1 } };
+                if (newTransaction.type === 'debit') newTransaction.installments.total = 1;
+                appData.transactions.push(newTransaction);
+                saveData(); renderUI(); transactionForm.reset(); transDateInput.valueAsDate = new Date(); installmentsGroup.classList.add('hidden');
+            });
+            confirmDeleteBtn.addEventListener('click', () => {
+                if(transactionToDelete) { appData.transactions = appData.transactions.filter(t => t.id !== transactionToDelete); saveData(); renderUI(); }
+                closeDeleteModal();
+            });
+            exportCsvButton.addEventListener('click', exportToCSV);
+            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+            deleteModal.addEventListener('click', (e) => { if(e.target === deleteModal) closeDeleteModal(); });
+            
+            const init = () => { populateSelectors(); loadData(); renderUI(); };
+            init();
+        });
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./service-worker.js').then(reg => console.log('Service worker registered')).catch(err => console.log('Service worker not registered', err)); }); }
+    </script>
+</body>
+</html>
+
