@@ -75,10 +75,10 @@
 
         <!-- Cards de Resumo -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-blue-100 text-blue-600 p-3 rounded-full"><i data-feather="dollar-sign"></i></div><div><h3 class="font-semibold text-gray-500">Saldo Final (Débito)</h3><p id="final-balance" class="text-3xl font-bold text-blue-600">R$ 0,00</p><p id="debit-summary" class="text-sm text-gray-400 mt-1">Gasto: R$ 0,00</p></div></div>
-            <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-red-100 text-red-600 p-3 rounded-full"><i data-feather="credit-card"></i></div><div><h3 class="font-semibold text-gray-500">Fatura Atual (Crédito)</h3><p id="current-bill" class="text-3xl font-bold text-red-600">R$ 0,00</p><p id="credit-summary" class="text-sm text-gray-400 mt-1">Limite usado: 0%</p></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-indigo-100 text-indigo-600 p-3 rounded-full"><i data-feather="dollar-sign"></i></div><div><h3 class="font-semibold text-gray-500">Saldo Final (Débito)</h3><p id="final-balance" class="text-3xl font-bold text-indigo-600">R$ 0,00</p><p id="debit-summary" class="text-sm text-gray-400 mt-1">Saídas: R$ 0,00</p></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-blue-100 text-blue-600 p-3 rounded-full"><i data-feather="credit-card"></i></div><div><h3 class="font-semibold text-gray-500">Fatura Atual (Crédito)</h3><p id="current-bill" class="text-3xl font-bold text-blue-600">R$ 0,00</p><p id="credit-summary" class="text-sm text-gray-400 mt-1">Limite usado: 0%</p></div></div>
             <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-green-100 text-green-600 p-3 rounded-full"><i data-feather="shield"></i></div><div><h3 class="font-semibold text-gray-500">Limite Restante</h3><p id="remaining-limit" class="text-3xl font-bold text-green-600">R$ 0,00</p><p class="text-sm text-gray-400 mt-1">Disponível para compras</p></div></div>
-            <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-purple-100 text-purple-600 p-3 rounded-full"><i data-feather="bar-chart-2"></i></div><div><h3 class="font-semibold text-gray-500">Gasto Total do Mês</h3><p id="total-spent-month" class="text-3xl font-bold text-purple-600">R$ 0,00</p><p class="text-sm text-gray-400 mt-1">Débito + Crédito</p></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-purple-100 text-purple-600 p-3 rounded-full"><i data-feather="bar-chart-2"></i></div><div><h3 class="font-semibold text-gray-500">Gasto Total do Mês</h3><p id="total-spent-month" class="text-3xl font-bold text-purple-600">R$ 0,00</p><p class="text-sm text-gray-400 mt-1">Saída Débito + Crédito</p></div></div>
         </div>
         
         <!-- Seção Principal -->
@@ -86,7 +86,7 @@
             <!-- Coluna Esquerda: Configurações, Formulário e Gráfico -->
             <div class="lg:col-span-2 flex flex-col gap-8">
                 <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Configurações do Mês</h2><div class="space-y-4"><div><label for="initial-balance" class="block text-sm font-medium text-gray-600 mb-1">Saldo Inicial (Débito)</label><input type="number" id="initial-balance" placeholder="Ex: 1500,00" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="credit-limit" class="block text-sm font-medium text-gray-600 mb-1">Limite do Cartão de Crédito</label><input type="number" id="credit-limit" placeholder="Ex: 5000,00" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div></div></div>
-                <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Adicionar Transação</h2><form id="transaction-form" class="space-y-4"><div><label for="trans-description" class="block text-sm font-medium text-gray-600 mb-1">Descrição</label><input type="text" id="trans-description" placeholder="Ex: Supermercado, Gasolina" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-value" class="block text-sm font-medium text-gray-600 mb-1">Valor</label><input type="number" id="trans-value" step="0.01" placeholder="Ex: 150,50" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-date" class="block text-sm font-medium text-gray-600 mb-1">Data</label><input type="date" id="trans-date" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-user" class="block text-sm font-medium text-gray-600 mb-1">Usuário</label><select id="trans-user" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Mãe">Mãe</option><option value="Pai">Pai</option><option value="Matheus">Matheus</option><option value="Murilo">Murilo</option><option value="Outro">Outro</option></select></div><div><label for="trans-category" class="block text-sm font-medium text-gray-600 mb-1">Categoria</label><select id="trans-category" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Moradia">Moradia</option><option value="Saúde">Saúde</option><option value="Educação">Educação</option><option value="Outros">Outros</option></select></div><div><label for="trans-type" class="block text-sm font-medium text-gray-600 mb-1">Tipo</label><select id="trans-type" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="debit">Débito</option><option value="credit">Crédito</option></select></div><div id="installments-group" class="hidden"><label for="trans-installments" class="block text-sm font-medium text-gray-600 mb-1">Nº de Parcelas (valor total)</label><input type="number" id="trans-installments" value="1" min="1" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg">Adicionar</button></form></div>
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Adicionar Transação</h2><form id="transaction-form" class="space-y-4"><div><label for="trans-description" class="block text-sm font-medium text-gray-600 mb-1">Descrição</label><input type="text" id="trans-description" placeholder="Ex: Supermercado, Salário" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-value" class="block text-sm font-medium text-gray-600 mb-1">Valor</label><input type="number" id="trans-value" step="0.01" placeholder="Ex: 150,50" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-date" class="block text-sm font-medium text-gray-600 mb-1">Data</label><input type="date" id="trans-date" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-user" class="block text-sm font-medium text-gray-600 mb-1">Usuário</label><select id="trans-user" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Mãe">Mãe</option><option value="Pai">Pai</option><option value="Matheus">Matheus</option><option value="Murilo">Murilo</option><option value="Outro">Outro</option></select></div><div><label for="trans-category" class="block text-sm font-medium text-gray-600 mb-1">Categoria</label><select id="trans-category" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Moradia">Moradia</option><option value="Saúde">Saúde</option><option value="Educação">Educação</option><option value="Salário">Salário</option><option value="Depósito">Depósito</option><option value="Outros">Outros</option></select></div><div><label for="trans-type" class="block text-sm font-medium text-gray-600 mb-1">Tipo</label><select id="trans-type" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="entry">Entrada (Débito)</option><option value="debit">Saída (Débito)</option><option value="credit">Crédito</option></select></div><div id="installments-group" class="hidden"><label for="trans-installments" class="block text-sm font-medium text-gray-600 mb-1">Nº de Parcelas (valor total)</label><input type="number" id="trans-installments" value="1" min="1" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg">Adicionar</button></form></div>
             </div>
              <!-- Coluna Direita: Extratos -->
             <div class="lg:col-span-3 flex flex-col gap-8">
@@ -187,13 +187,13 @@
                 creditList.innerHTML = '';
 
                 const debitTransactionsThisMonth = appData.transactions.filter(t => {
-                    const tDate = new Date(t.date + 'T00:00:00');
-                    return t.type === 'debit' && tDate.getFullYear() === year && tDate.getMonth() === month;
+                    const tDate = new Date(t.date + 'T00:00:00'); // Corrigido para incluir o T00:00:00 para evitar problemas de fuso
+                    return (t.type === 'debit' || t.type === 'entry') && tDate.getFullYear() === year && tDate.getMonth() === month;
                 });
                 
                 const creditInstallmentsThisMonth = [];
                 appData.transactions.filter(t => t.type === 'credit').forEach(t => {
-                    const purchaseDate = new Date(t.date + 'T00:00:00');
+                    const purchaseDate = new Date(t.date + 'T00:00:00'); // Corrigido para incluir o T00:00:00
                     const installmentValue = t.value / t.installments.total;
                     for (let i = 0; i < t.installments.total; i++) {
                         const installmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + i, purchaseDate.getDate());
@@ -203,7 +203,12 @@
                     }
                 });
 
-                if (debitTransactionsThisMonth.length === 0) debitList.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhuma transação de débito este mês.</p>';
+                // Ordenar transações por data
+                debitTransactionsThisMonth.sort((a, b) => new Date(a.date) - new Date(b.date));
+                creditInstallmentsThisMonth.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+
+                if (debitTransactionsThisMonth.length === 0) debitList.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhuma transação na conta débito este mês.</p>';
                 else debitTransactionsThisMonth.forEach(t => debitList.appendChild(createTransactionElement(t)));
 
                 if (creditInstallmentsThisMonth.length === 0) creditList.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhuma transação de crédito este mês.</p>';
@@ -214,9 +219,24 @@
                 const value = transaction.installmentValue !== undefined ? transaction.installmentValue : transaction.value;
                 const element = document.createElement('div');
                 element.className = 'flex justify-between items-center p-3 rounded-lg border hover:bg-gray-50 transition';
+                
+                let color = 'gray';
+                let icon = 'alert-circle';
+
+                if (transaction.type === 'entry') {
+                    color = 'green';
+                    icon = 'arrow-down-circle';
+                } else if (transaction.type === 'debit') {
+                    color = 'red';
+                    icon = 'arrow-up-circle';
+                } else if (transaction.type === 'credit') {
+                    color = 'blue';
+                    icon = 'credit-card';
+                }
+                
                 element.innerHTML = `
-                    <div class="flex items-center gap-3"><div class="p-2 rounded-full bg-${transaction.type === 'debit' ? 'blue' : 'red'}-100 text-${transaction.type === 'debit' ? 'blue' : 'red'}-600"><i data-feather="${transaction.type === 'debit' ? 'arrow-up-circle' : 'arrow-down-circle'}" class="w-5 h-5"></i></div><div><p class="font-semibold">${transaction.description}</p><p class="text-sm text-gray-500">${transaction.user} &bull; ${transaction.category || 'Sem Categoria'}</p></div></div>
-                    <div class="text-right flex items-center gap-2"><p class="font-bold text-${transaction.type === 'debit' ? 'blue' : 'red'}-600">${formatCurrency(value)}</p><button data-id="${transaction.id}" class="delete-btn text-gray-400 hover:text-red-500 transition"><i data-feather="trash-2" class="w-4 h-4"></i></button></div>`;
+                    <div class="flex items-center gap-3"><div class="p-2 rounded-full bg-${color}-100 text-${color}-600"><i data-feather="${icon}" class="w-5 h-5"></i></div><div><p class="font-semibold">${transaction.description}</p><p class="text-sm text-gray-500">${transaction.user} &bull; ${transaction.category || 'Sem Categoria'}</p></div></div>
+                    <div class="text-right flex items-center gap-2"><p class="font-bold text-${color}-600">${formatCurrency(value)}</p><button data-id="${transaction.id}" class="delete-btn text-gray-400 hover:text-red-500 transition"><i data-feather="trash-2" class="w-4 h-4"></i></button></div>`;
                 element.querySelector('.delete-btn').addEventListener('click', () => openDeleteModal(transaction.id));
                 return element;
             };
@@ -226,12 +246,15 @@
                 const settings = appData.monthlySettings[periodKey] || { initialBalance: 0, creditLimit: 0 };
                 
                 const debitTotal = appData.transactions.filter(t => { const tDate = new Date(t.date + 'T00:00:00'); return t.type === 'debit' && tDate.getFullYear() === year && tDate.getMonth() === month; }).reduce((sum, t) => sum + t.value, 0);
-                document.getElementById('final-balance').textContent = formatCurrency(settings.initialBalance - debitTotal);
-                document.getElementById('debit-summary').textContent = `Gasto: ${formatCurrency(debitTotal)}`;
+                const entryTotal = appData.transactions.filter(t => { const tDate = new Date(t.date + 'T00:00:00'); return t.type === 'entry' && tDate.getFullYear() === year && tDate.getMonth() === month; }).reduce((sum, t) => sum + t.value, 0);
+                
+                const finalBalance = settings.initialBalance + entryTotal - debitTotal;
+                document.getElementById('final-balance').textContent = formatCurrency(finalBalance);
+                document.getElementById('debit-summary').innerHTML = `<span class="text-green-600">Entradas: ${formatCurrency(entryTotal)}</span> &bull; <span class="text-red-600">Saídas: ${formatCurrency(debitTotal)}</span>`;
 
                 let currentBill = 0; let totalCommitted = 0;
                 appData.transactions.filter(t => t.type === 'credit').forEach(t => {
-                    const purchaseDate = new Date(t.date + 'T00:00:00');
+                    const purchaseDate = new Date(t.date + 'T00:00:00'); // Corrigido
                     const lastInstallmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + t.installments.total - 1, purchaseDate.getDate());
                     if(lastInstallmentDate >= new Date(year, month, 1)) { totalCommitted += t.value; }
                     for (let i = 0; i < t.installments.total; i++) {
@@ -248,12 +271,12 @@
 
             const updateChart = (year, month) => {
                 const transactionsInMonth = appData.transactions.filter(t => {
-                    const tDate = new Date(t.date + 'T00:00:00');
+                    const tDate = new Date(t.date + 'T00:00:00'); // Corrigido
                     if (t.type === 'debit') {
                         return tDate.getFullYear() === year && tDate.getMonth() === month;
                     }
                     if (t.type === 'credit') {
-                        const purchaseDate = new Date(t.date + 'T00:00:00');
+                        const purchaseDate = new Date(t.date + 'T00:00:00'); // Corrigido
                         for (let i = 0; i < t.installments.total; i++) {
                             const installmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + i, 1);
                             if(installmentDate.getFullYear() === year && installmentDate.getMonth() === month) return true;
@@ -266,8 +289,10 @@
                     let value = 0;
                     if (t.type === 'debit') {
                         value = t.value;
-                    } else { // credit
+                    } else if (t.type === 'credit') { // credit
                          value = t.value / t.installments.total;
+                    } else { // 'entry'
+                        return acc; // Não conta entradas no gráfico de gastos
                     }
                     acc[t.user] = (acc[t.user] || 0) + value;
                     return acc;
@@ -278,6 +303,20 @@
 
                 const chartCtx = document.getElementById('spending-chart').getContext('2d');
                 if (spendingChart) spendingChart.destroy();
+                
+                // Evita criar gráfico vazio se não houver dados
+                if (data.length === 0) {
+                    // Limpa o canvas se não houver dados
+                    spendingChart = null; 
+                    chartCtx.clearRect(0, 0, chartCtx.canvas.width, chartCtx.canvas.height);
+                     // Adiciona mensagem
+                    chartCtx.font = "16px 'Inter', sans-serif";
+                    chartCtx.fillStyle = "#9ca3af";
+                    chartCtx.textAlign = "center";
+                    chartCtx.fillText("Sem dados de gastos para exibir", chartCtx.canvas.width / 2, chartCtx.canvas.height / 2);
+                    return;
+                }
+
                 spendingChart = new Chart(chartCtx, {
                     type: 'doughnut',
                     data: {
@@ -293,13 +332,18 @@
                 const month = parseInt(monthSelect.value);
                 const headers = 'Data,Descrição,Usuário,Categoria,Tipo,Valor,Parcela\n';
                 const rows = appData.transactions.flatMap(t => {
-                    const purchaseDate = new Date(t.date + 'T00:00:00');
+                    const purchaseDate = new Date(t.date + 'T00:00:00'); // Corrigido
                     if(t.type === 'debit') {
                          if(purchaseDate.getFullYear() === year && purchaseDate.getMonth() === month) {
-                            return `"${t.date}","${t.description}","${t.user}","${t.category}","Débito","${t.value.toFixed(2)}","1/1"\n`;
+                            return `"${t.date}","${t.description}","${t.user}","${t.category}","Saída (Débito)","${t.value.toFixed(2)}","1/1"\n`;
                          }
                          return [];
-                    } else {
+                    } else if (t.type === 'entry') {
+                         if(purchaseDate.getFullYear() === year && purchaseDate.getMonth() === month) {
+                            return `"${t.date}","${t.description}","${t.user}","${t.category}","Entrada (Débito)","${t.value.toFixed(2)}","1/1"\n`;
+                         }
+                         return [];
+                    } else { // credit
                         let installmentsInMonth = [];
                          for (let i = 0; i < t.installments.total; i++) {
                             const installmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + i, 1);
@@ -311,8 +355,8 @@
                     }
                 }).join('');
 
-                const csvContent = "data:text/csv;charset=utf-8," + headers + rows;
-                const encodedUri = encodeURI(csvContent);
+                const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + rows); // Corrigido para encodeURIComponent
+                const encodedUri = csvContent; // encodeURI(csvContent);
                 const link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
                 link.setAttribute("download", `extrato_${year}_${monthNames[month]}.csv`);
@@ -339,7 +383,7 @@
             transactionForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const newTransaction = { id: crypto.randomUUID(), description: document.getElementById('trans-description').value, value: parseFloat(document.getElementById('trans-value').value), date: document.getElementById('trans-date').value, user: document.getElementById('trans-user').value, category: document.getElementById('trans-category').value, type: document.getElementById('trans-type').value, installments: { total: parseInt(document.getElementById('trans-installments').value) || 1 } };
-                if (newTransaction.type === 'debit') newTransaction.installments.total = 1;
+                if (newTransaction.type === 'debit' || newTransaction.type === 'entry') newTransaction.installments.total = 1;
                 appData.transactions.push(newTransaction);
                 saveData(); renderUI(); transactionForm.reset(); transDateInput.valueAsDate = new Date(); installmentsGroup.classList.add('hidden');
             });
@@ -360,4 +404,3 @@
     </script>
 </body>
 </html>
-
