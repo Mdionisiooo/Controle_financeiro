@@ -22,7 +22,7 @@
         /* Estilo customizado para a fonte Inter */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5;
+            background-color: #f0f2f5; /* Cor de fundo fixa */
         }
         /* Estilo para a barra de rolagem */
         ::-webkit-scrollbar { width: 8px; }
@@ -58,7 +58,7 @@
             <p class="text-gray-500 mt-2">Sua vida financeira organizada, mês a mês.</p>
         </header>
 
-        <!-- Seletor de Mês e Ano e Botão Exportar -->
+        <!-- Seletor de Mês e Ano e Botões -->
         <div class="bg-white p-4 rounded-xl shadow-md mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
              <div class="flex flex-col md:flex-row items-center gap-4">
                 <label for="month-select" class="font-semibold text-gray-600">Selecione o Período:</label>
@@ -67,37 +67,48 @@
                     <select id="year-select" class="p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"></select>
                 </div>
             </div>
-            <button id="export-csv" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300 shadow-md flex items-center gap-2">
-                <i data-feather="download" class="w-4 h-4"></i>
-                Exportar CSV
-            </button>
+            <div class="flex items-center gap-4">
+                <button id="export-csv" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300 shadow-md flex items-center gap-2">
+                    <i data-feather="download" class="w-4 h-4"></i>
+                    Exportar CSV
+                </button>
+                <!-- Botão de Tema Removido -->
+            </div>
         </div>
 
         <!-- Cards de Resumo -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
             <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-indigo-100 text-indigo-600 p-3 rounded-full"><i data-feather="dollar-sign"></i></div><div><h3 class="font-semibold text-gray-500">Saldo Final (Débito)</h3><p id="final-balance" class="text-3xl font-bold text-indigo-600">R$ 0,00</p><p id="debit-summary" class="text-sm text-gray-400 mt-1">Saídas: R$ 0,00</p></div></div>
             <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-blue-100 text-blue-600 p-3 rounded-full"><i data-feather="credit-card"></i></div><div><h3 class="font-semibold text-gray-500">Fatura Atual (Crédito)</h3><p id="current-bill" class="text-3xl font-bold text-blue-600">R$ 0,00</p><p id="credit-summary" class="text-sm text-gray-400 mt-1">Limite usado: 0%</p></div></div>
             <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-green-100 text-green-600 p-3 rounded-full"><i data-feather="shield"></i></div><div><h3 class="font-semibold text-gray-500">Limite Restante</h3><p id="remaining-limit" class="text-3xl font-bold text-green-600">R$ 0,00</p><p class="text-sm text-gray-400 mt-1">Disponível para compras</p></div></div>
             <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-purple-100 text-purple-600 p-3 rounded-full"><i data-feather="bar-chart-2"></i></div><div><h3 class="font-semibold text-gray-500">Gasto Total do Mês</h3><p id="total-spent-month" class="text-3xl font-bold text-purple-600">R$ 0,00</p><p class="text-sm text-gray-400 mt-1">Saída Débito + Crédito</p></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-teal-100 text-teal-600 p-3 rounded-full"><i data-feather="trending-up"></i></div><div><h3 class="font-semibold text-gray-500">Investimentos no Mês</h3><p id="total-invested" class="text-3xl font-bold text-teal-600">R$ 0,00</p><p class="text-sm text-gray-400 mt-1">Total alocado (Débito)</p></div></div>
         </div>
         
         <!-- Seção Principal -->
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            <!-- Coluna Esquerda: Configurações, Formulário e Gráfico -->
+            <!-- Coluna Esquerda: Configurações, Formulário -->
             <div class="lg:col-span-2 flex flex-col gap-8">
                 <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Configurações do Mês</h2><div class="space-y-4"><div><label for="initial-balance" class="block text-sm font-medium text-gray-600 mb-1">Saldo Inicial (Débito)</label><input type="number" id="initial-balance" placeholder="Ex: 1500,00" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="credit-limit" class="block text-sm font-medium text-gray-600 mb-1">Limite do Cartão de Crédito</label><input type="number" id="credit-limit" placeholder="Ex: 5000,00" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div></div></div>
-                <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Adicionar Transação</h2><form id="transaction-form" class="space-y-4"><div><label for="trans-description" class="block text-sm font-medium text-gray-600 mb-1">Descrição</label><input type="text" id="trans-description" placeholder="Ex: Supermercado, Salário" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-value" class="block text-sm font-medium text-gray-600 mb-1">Valor</label><input type="number" id="trans-value" step="0.01" placeholder="Ex: 150,50" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-date" class="block text-sm font-medium text-gray-600 mb-1">Data</label><input type="date" id="trans-date" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-user" class="block text-sm font-medium text-gray-600 mb-1">Usuário</label><select id="trans-user" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Mãe">Mãe</option><option value="Pai">Pai</option><option value="Matheus">Matheus</option><option value="Murilo">Murilo</option><option value="Outro">Outro</option></select></div><div><label for="trans-category" class="block text-sm font-medium text-gray-600 mb-1">Categoria</label><select id="trans-category" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Moradia">Moradia</option><option value="Saúde">Saúde</option><option value="Educação">Educação</option><option value="Salário">Salário</option><option value="Depósito">Depósito</option><option value="Outros">Outros</option></select></div><div><label for="trans-type" class="block text-sm font-medium text-gray-600 mb-1">Tipo</label><select id="trans-type" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="entry">Entrada (Débito)</option><option value="debit">Saída (Débito)</option><option value="credit">Crédito</option></select></div><div id="installments-group" class="hidden"><label for="trans-installments" class="block text-sm font-medium text-gray-600 mb-1">Nº de Parcelas (valor total)</label><input type="number" id="trans-installments" value="1" min="1" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg">Adicionar</button></form></div>
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Adicionar Transação</h2><form id="transaction-form" class="space-y-4"><div><label for="trans-description" class="block text-sm font-medium text-gray-600 mb-1">Descrição</label><input type="text" id="trans-description" placeholder="Ex: Supermercado, Salário" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-value" class="block text-sm font-medium text-gray-600 mb-1">Valor</label><input type="number" id="trans-value" step="0.01" placeholder="Ex: 150,50" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-date" class="block text-sm font-medium text-gray-600 mb-1">Data</label><input type="date" id="trans-date" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-user" class="block text-sm font-medium text-gray-600 mb-1">Usuário</label><select id="trans-user" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Mãe">Mãe</option><option value="Pai">Pai</option><option value="Matheus">Matheus</option><option value="Murilo">Murilo</option><option value="Outro">Outro</option></select></div><div><label for="trans-category" class="block text-sm font-medium text-gray-600 mb-1">Categoria</label><select id="trans-category" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Moradia">Moradia</option><option value="Saúde">Saúde</option><option value="Educação">Educação</option><option value="Salário">Salário</option><option value="Depósito">Depósito</option><option value="Investimentos">Investimentos</option><option value="Outros">Outros</option></select></div><div><label for="trans-type" class="block text-sm font-medium text-gray-600 mb-1">Tipo</label><select id="trans-type" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="entry">Entrada (Débito)</option><option value="debit">Saída (Débito)</option><option value="credit">Crédito</option></select></div><div id="installments-group" class="hidden"><label for="trans-installments" class="block text-sm font-medium text-gray-600 mb-1">Nº de Parcelas (valor total)</label><input type="number" id="trans-installments" value="1" min="1" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg">Adicionar</button></form></div>
             </div>
-             <!-- Coluna Direita: Extratos -->
+             <!-- Coluna Direita: Gráficos e Extratos -->
             <div class="lg:col-span-3 flex flex-col gap-8">
-                 <!-- Gráfico de Gastos -->
+                 <!-- Gráfico de Gastos por Usuário -->
                 <div class="bg-white p-6 rounded-xl shadow-md fade-in">
                     <h2 class="text-xl font-bold mb-4 text-gray-700">Gastos por Usuário</h2>
                     <div class="relative h-64">
-                         <canvas id="spending-chart"></canvas>
+                         <canvas id="user-chart"></canvas>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Extrato de Débito</h2><div id="debit-list" class="space-y-3 max-h-96 overflow-y-auto pr-2"><p class="text-gray-500 text-center py-4">Nenhuma transação de débito este mês.</p></div></div>
+                <!-- Gráfico de Gastos por Categoria -->
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in">
+                    <h2 class="text-xl font-bold mb-4 text-gray-700">Gastos por Categoria</h2>
+                    <div class="relative h-64">
+                         <canvas id="category-chart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Extrato de Débito</h2><div id="debit-list" class="space-y-3 max-h-96 overflow-y-auto pr-2"><p class="text-gray-500 text-center py-4">Nenhuma transação na conta débito este mês.</p></div></div>
                 <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Fatura do Cartão de Crédito</h2><div id="credit-list" class="space-y-3 max-h-96 overflow-y-auto pr-2"><p class="text-gray-500 text-center py-4">Nenhuma transação de crédito este mês.</p></div></div>
             </div>
         </div>
@@ -130,11 +141,13 @@
             const deleteModal = document.getElementById('delete-modal');
             const cancelDeleteBtn = document.getElementById('cancel-delete');
             const confirmDeleteBtn = document.getElementById('confirm-delete');
+            // Elementos do tema removidos
 
             const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
             let appData = { transactions: [], monthlySettings: {} };
             let transactionToDelete = null;
-            let spendingChart = null;
+            let userChart = null;
+            let categoryChart = null;
 
             const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
             const getCurrentPeriodKey = () => `${yearSelect.value}-${monthSelect.value}`;
@@ -176,7 +189,8 @@
 
                 renderTransactions(year, month);
                 calculateAndRenderSummary(year, month);
-                updateChart(year, month);
+                updateUserChart(year, month);
+                updateCategoryChart(year, month);
                 feather.replace();
             };
 
@@ -187,13 +201,13 @@
                 creditList.innerHTML = '';
 
                 const debitTransactionsThisMonth = appData.transactions.filter(t => {
-                    const tDate = new Date(t.date + 'T00:00:00'); // Corrigido para incluir o T00:00:00 para evitar problemas de fuso
+                    const tDate = new Date(t.date + 'T00:00:00');
                     return (t.type === 'debit' || t.type === 'entry') && tDate.getFullYear() === year && tDate.getMonth() === month;
                 });
                 
                 const creditInstallmentsThisMonth = [];
                 appData.transactions.filter(t => t.type === 'credit').forEach(t => {
-                    const purchaseDate = new Date(t.date + 'T00:00:00'); // Corrigido para incluir o T00:00:00
+                    const purchaseDate = new Date(t.date + 'T00:00:00');
                     const installmentValue = t.value / t.installments.total;
                     for (let i = 0; i < t.installments.total; i++) {
                         const installmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + i, purchaseDate.getDate());
@@ -203,7 +217,6 @@
                     }
                 });
 
-                // Ordenar transações por data
                 debitTransactionsThisMonth.sort((a, b) => new Date(a.date) - new Date(b.date));
                 creditInstallmentsThisMonth.sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -254,7 +267,7 @@
 
                 let currentBill = 0; let totalCommitted = 0;
                 appData.transactions.filter(t => t.type === 'credit').forEach(t => {
-                    const purchaseDate = new Date(t.date + 'T00:00:00'); // Corrigido
+                    const purchaseDate = new Date(t.date + 'T00:00:00');
                     const lastInstallmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + t.installments.total - 1, purchaseDate.getDate());
                     if(lastInstallmentDate >= new Date(year, month, 1)) { totalCommitted += t.value; }
                     for (let i = 0; i < t.installments.total; i++) {
@@ -267,16 +280,23 @@
                 document.getElementById('credit-summary').textContent = `Limite usado: ${limitUsage.toFixed(1)}%`;
                 document.getElementById('remaining-limit').textContent = formatCurrency(settings.creditLimit - totalCommitted);
                 document.getElementById('total-spent-month').textContent = formatCurrency(debitTotal + currentBill);
+
+                // Calcular Total Investido (apenas tipo 'debit')
+                const investmentTotal = appData.transactions.filter(t => {
+                    const tDate = new Date(t.date + 'T00:00:00');
+                    return t.type === 'debit' && t.category === 'Investimentos' && tDate.getFullYear() === year && tDate.getMonth() === month;
+                }).reduce((sum, t) => sum + t.value, 0);
+                document.getElementById('total-invested').textContent = formatCurrency(investmentTotal);
             };
 
-            const updateChart = (year, month) => {
-                const transactionsInMonth = appData.transactions.filter(t => {
-                    const tDate = new Date(t.date + 'T00:00:00'); // Corrigido
+            const getTransactionsInMonth = (year, month) => {
+                 return appData.transactions.filter(t => {
+                    const tDate = new Date(t.date + 'T00:00:00');
                     if (t.type === 'debit') {
                         return tDate.getFullYear() === year && tDate.getMonth() === month;
                     }
                     if (t.type === 'credit') {
-                        const purchaseDate = new Date(t.date + 'T00:00:00'); // Corrigido
+                        const purchaseDate = new Date(t.date + 'T00:00:00');
                         for (let i = 0; i < t.installments.total; i++) {
                             const installmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + i, 1);
                             if(installmentDate.getFullYear() === year && installmentDate.getMonth() === month) return true;
@@ -284,46 +304,97 @@
                     }
                     return false;
                 });
+            };
 
+            const getChartOptions = () => {
+                const chartLegendColor = '#374151'; // Cor fixa (gray-700)
+                return {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: chartLegendColor }
+                        }
+                    }
+                };
+            };
+            
+            const drawEmptyChartMessage = (ctx, message) => {
+                 ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.font = "16px 'Inter', sans-serif";
+                ctx.fillStyle = "#9ca3af"; // Cor fixa (gray-400)
+                ctx.textAlign = "center";
+                ctx.fillText(message, ctx.canvas.width / 2, ctx.canvas.height / 2);
+            };
+
+            const updateUserChart = (year, month) => {
+                const transactionsInMonth = getTransactionsInMonth(year, month);
                 const spendingByUser = transactionsInMonth.reduce((acc, t) => {
                     let value = 0;
-                    if (t.type === 'debit') {
-                        value = t.value;
-                    } else if (t.type === 'credit') { // credit
-                         value = t.value / t.installments.total;
-                    } else { // 'entry'
-                        return acc; // Não conta entradas no gráfico de gastos
-                    }
+                    if (t.type === 'debit') { value = t.value; } 
+                    else if (t.type === 'credit') { value = t.value / t.installments.total; }
+                    else { return acc; }
                     acc[t.user] = (acc[t.user] || 0) + value;
                     return acc;
                 }, {});
 
                 const labels = Object.keys(spendingByUser);
                 const data = Object.values(spendingByUser);
-
-                const chartCtx = document.getElementById('spending-chart').getContext('2d');
-                if (spendingChart) spendingChart.destroy();
+                const chartCtx = document.getElementById('user-chart').getContext('2d');
+                if (userChart) userChart.destroy();
                 
-                // Evita criar gráfico vazio se não houver dados
                 if (data.length === 0) {
-                    // Limpa o canvas se não houver dados
-                    spendingChart = null; 
-                    chartCtx.clearRect(0, 0, chartCtx.canvas.width, chartCtx.canvas.height);
-                     // Adiciona mensagem
-                    chartCtx.font = "16px 'Inter', sans-serif";
-                    chartCtx.fillStyle = "#9ca3af";
-                    chartCtx.textAlign = "center";
-                    chartCtx.fillText("Sem dados de gastos para exibir", chartCtx.canvas.width / 2, chartCtx.canvas.height / 2);
+                    userChart = null; 
+                    drawEmptyChartMessage(chartCtx, "Sem dados de gastos por usuário");
                     return;
                 }
 
-                spendingChart = new Chart(chartCtx, {
+                userChart = new Chart(chartCtx, {
                     type: 'doughnut',
                     data: {
                         labels: labels,
                         datasets: [{ label: 'Gastos por Usuário', data: data, backgroundColor: ['#3b82f6', '#ef4444', '#22c55e', '#a855f7', '#f97316'], hoverOffset: 4 }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                    options: getChartOptions()
+                });
+            };
+            
+            const updateCategoryChart = (year, month) => {
+                const transactionsInMonth = getTransactionsInMonth(year, month);
+                const spendingByCategory = transactionsInMonth.reduce((acc, t) => {
+                    let value = 0;
+                    if (t.type === 'debit') { value = t.value; } 
+                    else if (t.type === 'credit') { value = t.value / t.installments.total; }
+                    else { return acc; }
+                    
+                    // Excluir categorias que não são "gastos" (Entradas ou Investimentos)
+                    if (['Salário', 'Depósito', 'Investimentos'].includes(t.category)) {
+                        return acc;
+                    }
+
+                    acc[t.category] = (acc[t.category] || 0) + value;
+                    return acc;
+                }, {});
+
+                const labels = Object.keys(spendingByCategory);
+                const data = Object.values(spendingByCategory);
+                const chartCtx = document.getElementById('category-chart').getContext('2d');
+                if (categoryChart) categoryChart.destroy();
+
+                if (data.length === 0) {
+                    categoryChart = null; 
+                    drawEmptyChartMessage(chartCtx, "Sem dados de gastos por categoria");
+                    return;
+                }
+
+                categoryChart = new Chart(chartCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{ label: 'Gastos por Categoria', data: data, backgroundColor: ['#10b981', '#f59e0b', '#ec4899', '#06b6d4', '#8b5cf6', '#d946ef', '#65a30d'], hoverOffset: 4 }]
+                    },
+                    options: getChartOptions()
                 });
             };
             
@@ -332,7 +403,7 @@
                 const month = parseInt(monthSelect.value);
                 const headers = 'Data,Descrição,Usuário,Categoria,Tipo,Valor,Parcela\n';
                 const rows = appData.transactions.flatMap(t => {
-                    const purchaseDate = new Date(t.date + 'T00:00:00'); // Corrigido
+                    const purchaseDate = new Date(t.date + 'T00:00:00');
                     if(t.type === 'debit') {
                          if(purchaseDate.getFullYear() === year && purchaseDate.getMonth() === month) {
                             return `"${t.date}","${t.description}","${t.user}","${t.category}","Saída (Débito)","${t.value.toFixed(2)}","1/1"\n`;
@@ -355,8 +426,8 @@
                     }
                 }).join('');
 
-                const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + rows); // Corrigido para encodeURIComponent
-                const encodedUri = csvContent; // encodeURI(csvContent);
+                const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + rows);
+                const encodedUri = csvContent;
                 const link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
                 link.setAttribute("download", `extrato_${year}_${monthNames[month]}.csv`);
@@ -373,6 +444,9 @@
                 transactionToDelete = null;
                 deleteModal.classList.add('hidden');
             };
+
+            // --- Lógica do Tema Escuro Removida ---
+
 
             // Event Listeners
             monthSelect.addEventListener('change', renderUI);
@@ -395,7 +469,12 @@
             cancelDeleteBtn.addEventListener('click', closeDeleteModal);
             deleteModal.addEventListener('click', (e) => { if(e.target === deleteModal) closeDeleteModal(); });
             
-            const init = () => { populateSelectors(); loadData(); renderUI(); };
+            const init = () => {
+                // applyTheme(); // Chamada removida
+                populateSelectors();
+                loadData();
+                renderUI();
+            };
             init();
         });
     </script>
