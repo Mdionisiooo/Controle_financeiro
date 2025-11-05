@@ -89,7 +89,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
             <!-- Coluna Esquerda: Configurações, Formulário -->
             <div class="lg:col-span-2 flex flex-col gap-8">
-                <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Configurações do Mês</h2><div class="space-y-4"><div><label for="initial-balance" class="block text-sm font-medium text-gray-600 mb-1">Saldo Inicial (Débito)</label><input type="number" id="initial-balance" placeholder="Ex: 1500,00" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="credit-limit" class="block text-sm font-medium text-gray-600 mb-1">Limite do Cartão de Crédito</label><input type="number" id="credit-limit" placeholder="Ex: 5000,00" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div></div></div>
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Configurações do Mês</h2><div class="space-y-4"><div><label for="initial-balance" class="block text-sm font-medium text-gray-600 mb-1">Saldo Inicial (Débito)</label><input type="number" id="initial-balance" placeholder="Ex: 1500,00" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="credit-limit" class="block text-sm font-medium text-gray-600 mb-1">Limite do Cartão de Crédito</label><input type="number" id="credit-limit" placeholder="Ex: 5000,00" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="credit-closing-day" class="block text-sm font-medium text-gray-600 mb-1">Dia de Fechamento da Fatura</label><input type="number" id="credit-closing-day" placeholder="Ex: 13 (deixa 0 se não houver)" min="0" max="31" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div></div></div>
                 <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Adicionar Transação</h2><form id="transaction-form" class="space-y-4"><div><label for="trans-description" class="block text-sm font-medium text-gray-600 mb-1">Descrição</label><input type="text" id="trans-description" placeholder="Ex: Supermercado, Salário" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-value" class="block text-sm font-medium text-gray-600 mb-1">Valor</label><input type="number" id="trans-value" step="0.01" placeholder="Ex: 150,50" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-date" class="block text-sm font-medium text-gray-600 mb-1">Data</label><input type="date" id="trans-date" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-user" class="block text-sm font-medium text-gray-600 mb-1">Usuário</label><select id="trans-user" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Mãe">Mãe</option><option value="Pai">Pai</option><option value="Matheus">Matheus</option><option value="Murilo">Murilo</option><option value="Outro">Outro</option></select></div><div><label for="trans-category" class="block text-sm font-medium text-gray-600 mb-1">Categoria</label><select id="trans-category" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Moradia">Moradia</option><option value="Saúde">Saúde</option><option value="Educação">Educação</option><option value="Salário">Salário</option><option value="Depósito">Depósito</option><option value="Investimentos">Investimentos</option><option value="Outros">Outros</option></select></div><div><label for="trans-type" class="block text-sm font-medium text-gray-600 mb-1">Tipo</label><select id="trans-type" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="entry">Entrada (Débito)</option><option value="debit">Saída (Débito)</option><option value="credit">Crédito</option></select></div><div id="installments-group" class="hidden"><label for="trans-installments" class="block text-sm font-medium text-gray-600 mb-1">Nº de Parcelas (valor total)</label><input type="number" id="trans-installments" value="1" min="1" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg">Adicionar</button></form></div>
             </div>
              <!-- Coluna Direita: Gráficos e Extratos -->
@@ -133,6 +133,7 @@
             const yearSelect = document.getElementById('year-select');
             const initialBalanceInput = document.getElementById('initial-balance');
             const creditLimitInput = document.getElementById('credit-limit');
+            const creditClosingDayInput = document.getElementById('credit-closing-day'); // Novo elemento
             const transactionForm = document.getElementById('transaction-form');
             const transTypeSelect = document.getElementById('trans-type');
             const installmentsGroup = document.getElementById('installments-group');
@@ -181,11 +182,12 @@
                 const month = parseInt(monthSelect.value);
                 
                 if (!appData.monthlySettings[periodKey]) {
-                    appData.monthlySettings[periodKey] = { initialBalance: 0, creditLimit: 0 };
+                    appData.monthlySettings[periodKey] = { initialBalance: 0, creditLimit: 0, closingDay: 0 }; // Adicionado closingDay
                 }
                 const settings = appData.monthlySettings[periodKey];
                 initialBalanceInput.value = settings.initialBalance > 0 ? settings.initialBalance : '';
                 creditLimitInput.value = settings.creditLimit > 0 ? settings.creditLimit : '';
+                creditClosingDayInput.value = settings.closingDay > 0 ? settings.closingDay : ''; // Define o valor do novo input
 
                 renderTransactions(year, month);
                 calculateAndRenderSummary(year, month);
@@ -208,9 +210,28 @@
                 const creditInstallmentsThisMonth = [];
                 appData.transactions.filter(t => t.type === 'credit').forEach(t => {
                     const purchaseDate = new Date(t.date + 'T00:00:00');
+                    const purchaseDay = purchaseDate.getDate();
+                    
+                    // Lógica do dia de fechamento
+                    const purchasePeriodKey = `${purchaseDate.getFullYear()}-${purchaseDate.getMonth()}`;
+                    const purchaseSettings = appData.monthlySettings[purchasePeriodKey];
+                    const closingDay = purchaseSettings ? purchaseSettings.closingDay : 0;
+                    
+                    let firstBillMonth = purchaseDate.getMonth();
+                    let firstBillYear = purchaseDate.getFullYear();
+
+                    if (closingDay > 0 && purchaseDay > closingDay) {
+                        firstBillMonth += 1;
+                        if (firstBillMonth > 11) {
+                            firstBillMonth = 0;
+                            firstBillYear += 1;
+                        }
+                    }
+                    // Fim da lógica
+
                     const installmentValue = t.value / t.installments.total;
                     for (let i = 0; i < t.installments.total; i++) {
-                        const installmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + i, purchaseDate.getDate());
+                        const installmentDate = new Date(firstBillYear, firstBillMonth + i, 1); // Baseado no primeiro mês da fatura
                         if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) {
                             creditInstallmentsThisMonth.push({ ...t, installmentValue, description: `${t.description} (${i + 1}/${t.installments.total})` });
                         }
@@ -268,10 +289,30 @@
                 let currentBill = 0; let totalCommitted = 0;
                 appData.transactions.filter(t => t.type === 'credit').forEach(t => {
                     const purchaseDate = new Date(t.date + 'T00:00:00');
-                    const lastInstallmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + t.installments.total - 1, purchaseDate.getDate());
+                    const purchaseDay = purchaseDate.getDate();
+
+                    // Lógica do dia de fechamento (replicada)
+                    const purchasePeriodKey = `${purchaseDate.getFullYear()}-${purchaseDate.getMonth()}`;
+                    const purchaseSettings = appData.monthlySettings[purchasePeriodKey];
+                    const closingDay = purchaseSettings ? purchaseSettings.closingDay : 0;
+                    
+                    let firstBillMonth = purchaseDate.getMonth();
+                    let firstBillYear = purchaseDate.getFullYear();
+
+                    if (closingDay > 0 && purchaseDay > closingDay) {
+                        firstBillMonth += 1;
+                        if (firstBillMonth > 11) {
+                            firstBillMonth = 0;
+                            firstBillYear += 1;
+                        }
+                    }
+                    // Fim da lógica
+
+                    const lastInstallmentDate = new Date(firstBillYear, firstBillMonth + t.installments.total - 1, 1);
                     if(lastInstallmentDate >= new Date(year, month, 1)) { totalCommitted += t.value; }
+                    
                     for (let i = 0; i < t.installments.total; i++) {
-                        const installmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + i, 1);
+                        const installmentDate = new Date(firstBillYear, firstBillMonth + i, 1);
                         if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) { currentBill += t.value / t.installments.total; }
                     }
                 });
@@ -453,6 +494,7 @@
             yearSelect.addEventListener('change', renderUI);
             initialBalanceInput.addEventListener('change', (e) => { appData.monthlySettings[getCurrentPeriodKey()].initialBalance = parseFloat(e.target.value) || 0; saveData(); renderUI(); });
             creditLimitInput.addEventListener('change', (e) => { appData.monthlySettings[getCurrentPeriodKey()].creditLimit = parseFloat(e.target.value) || 0; saveData(); renderUI(); });
+            creditClosingDayInput.addEventListener('change', (e) => { appData.monthlySettings[getCurrentPeriodKey()].closingDay = parseInt(e.target.value) || 0; saveData(); renderUI(); }); // Novo Event Listener
             transTypeSelect.addEventListener('change', (e) => installmentsGroup.classList.toggle('hidden', e.target.value !== 'credit'));
             transactionForm.addEventListener('submit', (e) => {
                 e.preventDefault();
