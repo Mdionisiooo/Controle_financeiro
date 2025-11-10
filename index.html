@@ -202,6 +202,11 @@
                 debitList.innerHTML = '';
                 creditList.innerHTML = '';
 
+                // CORREÇÃO: Puxar o closingDay do mês atual para usar em todos os cálculos
+                const periodKey = `${year}-${month}`;
+                const settings = appData.monthlySettings[periodKey] || { closingDay: 0 };
+                const currentClosingDay = settings.closingDay;
+
                 const debitTransactionsThisMonth = appData.transactions.filter(t => {
                     const tDate = new Date(t.date + 'T00:00:00');
                     return (t.type === 'debit' || t.type === 'entry') && tDate.getFullYear() === year && tDate.getMonth() === month;
@@ -212,10 +217,9 @@
                     const purchaseDate = new Date(t.date + 'T00:00:00');
                     const purchaseDay = purchaseDate.getDate();
                     
-                    // Lógica do dia de fechamento
-                    const purchasePeriodKey = `${purchaseDate.getFullYear()}-${purchaseDate.getMonth()}`;
-                    const purchaseSettings = appData.monthlySettings[purchasePeriodKey];
-                    const closingDay = purchaseSettings ? purchaseSettings.closingDay : 0;
+                    // Lógica do dia de fechamento (CORRIGIDA)
+                    // Usa a configuração do mês atual para todas as transações
+                    const closingDay = currentClosingDay;
                     
                     let firstBillMonth = purchaseDate.getMonth();
                     let firstBillYear = purchaseDate.getFullYear();
@@ -277,7 +281,8 @@
 
             const calculateAndRenderSummary = (year, month) => {
                 const periodKey = `${year}-${month}`;
-                const settings = appData.monthlySettings[periodKey] || { initialBalance: 0, creditLimit: 0 };
+                const settings = appData.monthlySettings[periodKey] || { initialBalance: 0, creditLimit: 0, closingDay: 0 };
+                const currentClosingDay = settings.closingDay; // Pega o dia de fechamento do mês ATUAL
                 
                 const debitTotal = appData.transactions.filter(t => { const tDate = new Date(t.date + 'T00:00:00'); return t.type === 'debit' && tDate.getFullYear() === year && tDate.getMonth() === month; }).reduce((sum, t) => sum + t.value, 0);
                 const entryTotal = appData.transactions.filter(t => { const tDate = new Date(t.date + 'T00:00:00'); return t.type === 'entry' && tDate.getFullYear() === year && tDate.getMonth() === month; }).reduce((sum, t) => sum + t.value, 0);
@@ -291,10 +296,9 @@
                     const purchaseDate = new Date(t.date + 'T00:00:00');
                     const purchaseDay = purchaseDate.getDate();
 
-                    // Lógica do dia de fechamento (replicada)
-                    const purchasePeriodKey = `${purchaseDate.getFullYear()}-${purchaseDate.getMonth()}`;
-                    const purchaseSettings = appData.monthlySettings[purchasePeriodKey];
-                    const closingDay = purchaseSettings ? purchaseSettings.closingDay : 0;
+                    // Lógica do dia de fechamento (CORRIGIDA)
+                    // Usa a configuração do mês atual para todas as transações
+                    const closingDay = currentClosingDay;
                     
                     let firstBillMonth = purchaseDate.getMonth();
                     let firstBillYear = purchaseDate.getFullYear();
@@ -331,20 +335,54 @@
             };
 
             const getTransactionsInMonth = (year, month) => {
-                 return appData.transactions.filter(t => {
-                    const tDate = new Date(t.date + 'T00:00:00');
-                    if (t.type === 'debit') {
-                        return tDate.getFullYear() === year && tDate.getMonth() === month;
-                    }
-                    if (t.type === 'credit') {
-                        const purchaseDate = new Date(t.date + 'T00:00:00');
+                 // Retorna um array de transações e parcelas que contam para os gráficos
+                 let transactions = [];
+                 
+                 // CORREÇÃO: Puxar o closingDay do mês atual para usar em todos os cálculos
+                 const periodKey = `${year}-${month}`;
+                 const settings = appData.monthlySettings[periodKey] || { closingDay: 0 };
+                 const currentClosingDay = settings.closingDay;
+
+                 appData.transactions.forEach(t => {
+                    const purchaseDate = new Date(t.date + 'T00:00:00');
+
+                    if (t.type === 'debit' || t.type === 'entry') {
+                        if (purchaseDate.getFullYear() === year && purchaseDate.getMonth() === month) {
+                            transactions.push(t);
+                        }
+                    } else if (t.type === 'credit') {
+                        // Lógica do dia de fechamento (CORRIGIDA)
+                        const purchaseDay = purchaseDate.getDate();
+                        const closingDay = currentClosingDay;
+                        
+                        let firstBillMonth = purchaseDate.getMonth();
+                        let firstBillYear = purchaseDate.getFullYear();
+
+                        if (closingDay > 0 && purchaseDay > closingDay) {
+                            firstBillMonth += 1;
+                            if (firstBillMonth > 11) {
+                                firstBillMonth = 0;
+                                firstBillYear += 1;
+                            }
+                        }
+                        // Fim da lógica
+                        
+                        const installmentValue = t.value / t.installments.total;
+                        
                         for (let i = 0; i < t.installments.total; i++) {
-                            const installmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + i, 1);
-                            if(installmentDate.getFullYear() === year && installmentDate.getMonth() === month) return true;
+                            const installmentDate = new Date(firstBillYear, firstBillMonth + i, 1);
+                            if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) {
+                                // Adiciona um objeto representando a parcela
+                                transactions.push({
+                                    ...t,
+                                    value: installmentValue, // Usa o valor da parcela
+                                    type: 'credit_installment' // Tipo especial para o gráfico
+                                });
+                            }
                         }
                     }
-                    return false;
-                });
+                 });
+                 return transactions;
             };
 
             const getChartOptions = () => {
@@ -372,11 +410,15 @@
             const updateUserChart = (year, month) => {
                 const transactionsInMonth = getTransactionsInMonth(year, month);
                 const spendingByUser = transactionsInMonth.reduce((acc, t) => {
-                    let value = 0;
-                    if (t.type === 'debit') { value = t.value; } 
-                    else if (t.type === 'credit') { value = t.value / t.installments.total; }
-                    else { return acc; }
-                    acc[t.user] = (acc[t.user] || 0) + value;
+                    let value = t.value;
+                    // Apenas gastos (saída débito ou parcela de crédito)
+                    if (t.type === 'debit' || t.type === 'credit_installment') {
+                        // CORREÇÃO: Excluir categorias que não são "gastos"
+                        if (['Salário', 'Depósito', 'Investimentos'].includes(t.category)) {
+                            return acc;
+                        }
+                        acc[t.user] = (acc[t.user] || 0) + value;
+                    }
                     return acc;
                 }, {});
 
@@ -404,10 +446,11 @@
             const updateCategoryChart = (year, month) => {
                 const transactionsInMonth = getTransactionsInMonth(year, month);
                 const spendingByCategory = transactionsInMonth.reduce((acc, t) => {
-                    let value = 0;
-                    if (t.type === 'debit') { value = t.value; } 
-                    else if (t.type === 'credit') { value = t.value / t.installments.total; }
-                    else { return acc; }
+                    let value = t.value;
+                    // Apenas gastos (saída débito ou parcela de crédito)
+                    if (t.type !== 'debit' && t.type !== 'credit_installment') {
+                        return acc;
+                    }
                     
                     // Excluir categorias que não são "gastos" (Entradas ou Investimentos)
                     if (['Salário', 'Depósito', 'Investimentos'].includes(t.category)) {
@@ -442,32 +485,55 @@
             const exportToCSV = () => {
                 const year = parseInt(yearSelect.value);
                 const month = parseInt(monthSelect.value);
-                const headers = 'Data,Descrição,Usuário,Categoria,Tipo,Valor,Parcela\n';
-                const rows = appData.transactions.flatMap(t => {
+                
+                // CORREÇÃO: Puxar o closingDay do mês atual para usar em todos os cálculos
+                const periodKey = `${year}-${month}`;
+                const settings = appData.monthlySettings[periodKey] || { closingDay: 0 };
+                const currentClosingDay = settings.closingDay;
+
+                // Correção: Usar ; como delimitador e adicionar BOM \uFEFF para Excel
+                const headers = 'Data;Descrição;Usuário;Categoria;Tipo;Valor;Parcela\n';
+                let rows = '';
+                
+                appData.transactions.forEach(t => {
                     const purchaseDate = new Date(t.date + 'T00:00:00');
-                    if(t.type === 'debit') {
+                    
+                    if(t.type === 'debit' || t.type === 'entry') {
                          if(purchaseDate.getFullYear() === year && purchaseDate.getMonth() === month) {
-                            return `"${t.date}","${t.description}","${t.user}","${t.category}","Saída (Débito)","${t.value.toFixed(2)}","1/1"\n`;
+                            const typeStr = t.type === 'entry' ? "Entrada (Débito)" : "Saída (Débito)";
+                            rows += `"${t.date}";"${t.description}";"${t.user}";"${t.category}";"${typeStr}";"${t.value.toFixed(2).replace('.',',')}";"1/1"\n`;
                          }
-                         return [];
-                    } else if (t.type === 'entry') {
-                         if(purchaseDate.getFullYear() === year && purchaseDate.getMonth() === month) {
-                            return `"${t.date}","${t.description}","${t.user}","${t.category}","Entrada (Débito)","${t.value.toFixed(2)}","1/1"\n`;
-                         }
-                         return [];
                     } else { // credit
-                        let installmentsInMonth = [];
-                         for (let i = 0; i < t.installments.total; i++) {
-                            const installmentDate = new Date(purchaseDate.getFullYear(), purchaseDate.getMonth() + i, 1);
-                            if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) {
-                                installmentsInMonth.push(`"${installmentDate.toLocaleDateString('pt-BR')}","${t.description}","${t.user}","${t.category}","Crédito","${(t.value/t.installments.total).toFixed(2)}","${i+1}/${t.installments.total}"\n`);
+                        // Correção: Adicionar lógica do dia de fechamento (CORRIGIDA)
+                        const purchaseDay = purchaseDate.getDate();
+                        const closingDay = currentClosingDay;
+                        
+                        let firstBillMonth = purchaseDate.getMonth();
+                        let firstBillYear = purchaseDate.getFullYear();
+
+                        if (closingDay > 0 && purchaseDay > closingDay) {
+                            firstBillMonth += 1;
+                            if (firstBillMonth > 11) {
+                                firstBillMonth = 0;
+                                firstBillYear += 1;
                             }
                         }
-                        return installmentsInMonth;
+                        // Fim da correção
+                        
+                        const installmentValue = t.value / t.installments.total;
+                        
+                        for (let i = 0; i < t.installments.total; i++) {
+                            const installmentDate = new Date(firstBillYear, firstBillMonth + i, 1);
+                            if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) {
+                                // Correção: Usar data da compra (t.date) e ;
+                                rows += `"${t.date}";"${t.description}";"${t.user}";"${t.category}";"Crédito";"${installmentValue.toFixed(2).replace('.',',')}";"${i+1}/${t.installments.total}"\n`;
+                            }
+                        }
                     }
-                }).join('');
+                });
 
-                const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + rows);
+                // Correção: Adicionar BOM \uFEFF para Excel ler UTF-8 corretamente
+                const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent('\uFEFF' + headers + rows);
                 const encodedUri = csvContent;
                 const link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
