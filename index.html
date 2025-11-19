@@ -4,19 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controlador Financeiro Pessoal</title>
-    <!-- Cor do tema para a barra de status do navegador (PWA) -->
     <meta name="theme-color" content="#4f46e5">
-    <!-- Link para o Manifest do PWA -->
     <link rel="manifest" href="manifest.json">
-    <!-- Incluindo Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Incluindo a fonte Inter do Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Ícones (Feather Icons) -->
     <script src="https://unpkg.com/feather-icons"></script>
-    <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Estilo customizado para a fonte Inter */
@@ -52,56 +46,75 @@
 <body class="antialiased text-gray-800">
 
     <div class="container mx-auto p-4 md:p-8 max-w-7xl">
-        <!-- Cabeçalho -->
         <header class="mb-8 text-center">
             <h1 class="text-4xl font-bold text-gray-700">Painel Financeiro</h1>
             <p class="text-gray-500 mt-2">Sua vida financeira organizada, mês a mês.</p>
         </header>
 
-        <!-- Seletor de Mês e Ano e Botões -->
         <div class="bg-white p-4 rounded-xl shadow-md mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
              <div class="flex flex-col md:flex-row items-center gap-4">
-                <label for="month-select" class="font-semibold text-gray-600">Selecione o Período:</label>
-                <div class="flex gap-4">
-                    <select id="month-select" class="p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"></select>
-                    <select id="year-select" class="p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"></select>
-                </div>
-            </div>
-            <div class="flex items-center gap-4">
-                <button id="export-csv" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300 shadow-md flex items-center gap-2">
-                    <i data-feather="download" class="w-4 h-4"></i>
-                    Exportar CSV
-                </button>
-                <!-- Botão de Tema Removido -->
-            </div>
+                 <label for="month-select" class="font-semibold text-gray-600">Selecione o Período:</label>
+                 <div class="flex gap-4">
+                     <select id="month-select" class="p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"></select>
+                     <select id="year-select" class="p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"></select>
+                 </div>
+             </div>
+             <div class="flex items-center gap-4">
+                 <button id="export-csv" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300 shadow-md flex items-center gap-2">
+                     <i data-feather="download" class="w-4 h-4"></i>
+                     Exportar CSV
+                 </button>
+                 </div>
         </div>
 
-        <!-- Cards de Resumo -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
             <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-indigo-100 text-indigo-600 p-3 rounded-full"><i data-feather="dollar-sign"></i></div><div><h3 class="font-semibold text-gray-500">Saldo Final (Débito)</h3><p id="final-balance" class="text-3xl font-bold text-indigo-600">R$ 0,00</p><p id="debit-summary" class="text-sm text-gray-400 mt-1">Saídas: R$ 0,00</p></div></div>
-            <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-blue-100 text-blue-600 p-3 rounded-full"><i data-feather="credit-card"></i></div><div><h3 class="font-semibold text-gray-500">Fatura Atual (Crédito)</h3><p id="current-bill" class="text-3xl font-bold text-blue-600">R$ 0,00</p><p id="credit-summary" class="text-sm text-gray-400 mt-1">Limite usado: 0%</p></div></div>
+            
+            <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4">
+                <div class="bg-blue-100 text-blue-600 p-3 rounded-full"><i data-feather="credit-card"></i></div>
+                <div>
+                    <h3 class="font-semibold text-gray-500">Fatura Atual (Crédito)</h3>
+                    <p id="current-bill" class="text-3xl font-bold text-blue-600">R$ 0,00</p>
+                    <p id="credit-summary" class="text-sm text-gray-400 mt-1">Limite usado: 0%</p>
+                    <button id="pay-bill-btn" class="hidden mt-2 text-sm bg-blue-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-blue-600 transition duration-300 shadow-md flex items-center gap-1">
+                        <i data-feather="check-circle" class="w-4 h-4"></i>Lançar Pagamento
+                    </button>
+                    </div>
+            </div>
             <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-green-100 text-green-600 p-3 rounded-full"><i data-feather="shield"></i></div><div><h3 class="font-semibold text-gray-500">Limite Restante</h3><p id="remaining-limit" class="text-3xl font-bold text-green-600">R$ 0,00</p><p class="text-sm text-gray-400 mt-1">Disponível para compras</p></div></div>
             <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-purple-100 text-purple-600 p-3 rounded-full"><i data-feather="bar-chart-2"></i></div><div><h3 class="font-semibold text-gray-500">Gasto Total do Mês</h3><p id="total-spent-month" class="text-3xl font-bold text-purple-600">R$ 0,00</p><p class="text-sm text-gray-400 mt-1">Saída Débito + Crédito</p></div></div>
             <div class="bg-white p-6 rounded-xl shadow-lg fade-in flex items-start gap-4"><div class="bg-teal-100 text-teal-600 p-3 rounded-full"><i data-feather="trending-up"></i></div><div><h3 class="font-semibold text-gray-500">Investimentos no Mês</h3><p id="total-invested" class="text-3xl font-bold text-teal-600">R$ 0,00</p><p class="text-sm text-gray-400 mt-1">Total alocado (Débito)</p></div></div>
         </div>
         
-        <!-- Seção Principal -->
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            <!-- Coluna Esquerda: Configurações, Formulário -->
             <div class="lg:col-span-2 flex flex-col gap-8">
                 <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Configurações do Mês</h2><div class="space-y-4"><div><label for="initial-balance" class="block text-sm font-medium text-gray-600 mb-1">Saldo Inicial (Débito)</label><input type="number" id="initial-balance" placeholder="Ex: 1500,00" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="credit-limit" class="block text-sm font-medium text-gray-600 mb-1">Limite do Cartão de Crédito</label><input type="number" id="credit-limit" placeholder="Ex: 5000,00" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="credit-closing-day" class="block text-sm font-medium text-gray-600 mb-1">Dia de Fechamento da Fatura</label><input type="number" id="credit-closing-day" placeholder="Ex: 13 (deixa 0 se não houver)" min="0" max="31" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div></div></div>
-                <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Adicionar Transação</h2><form id="transaction-form" class="space-y-4"><div><label for="trans-description" class="block text-sm font-medium text-gray-600 mb-1">Descrição</label><input type="text" id="trans-description" placeholder="Ex: Supermercado, Salário" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-value" class="block text-sm font-medium text-gray-600 mb-1">Valor</label><input type="number" id="trans-value" step="0.01" placeholder="Ex: 150,50" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-date" class="block text-sm font-medium text-gray-600 mb-1">Data</label><input type="date" id="trans-date" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-user" class="block text-sm font-medium text-gray-600 mb-1">Usuário</label><select id="trans-user" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Mãe">Mãe</option><option value="Pai">Pai</option><option value="Matheus">Matheus</option><option value="Murilo">Murilo</option><option value="Outro">Outro</option></select></div><div><label for="trans-category" class="block text-sm font-medium text-gray-600 mb-1">Categoria</label><select id="trans-category" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Moradia">Moradia</option><option value="Saúde">Saúde</option><option value="Educação">Educação</option><option value="Salário">Salário</option><option value="Depósito">Depósito</option><option value="Investimentos">Investimentos</option><option value="Outros">Outros</option></select></div><div><label for="trans-type" class="block text-sm font-medium text-gray-600 mb-1">Tipo</label><select id="trans-type" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="entry">Entrada (Débito)</option><option value="debit">Saída (Débito)</option><option value="credit">Crédito</option></select></div><div id="installments-group" class="hidden"><label for="trans-installments" class="block text-sm font-medium text-gray-600 mb-1">Nº de Parcelas (valor total)</label><input type="number" id="trans-installments" value="1" min="1" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg">Adicionar</button></form></div>
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in"><h2 class="text-xl font-bold mb-4 text-gray-700">Adicionar Transação</h2><form id="transaction-form" class="space-y-4"><div><label for="trans-description" class="block text-sm font-medium text-gray-600 mb-1">Descrição</label><input type="text" id="trans-description" placeholder="Ex: Supermercado, Salário" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-value" class="block text-sm font-medium text-gray-600 mb-1">Valor</label><input type="number" id="trans-value" step="0.01" placeholder="Ex: 150,50" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-date" class="block text-sm font-medium text-gray-600 mb-1">Data</label><input type="date" id="trans-date" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><div><label for="trans-user" class="block text-sm font-medium text-gray-600 mb-1">Usuário</label><select id="trans-user" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="Mãe">Mãe</option><option value="Pai">Pai</option><option value="Matheus">Matheus</option><option value="Murilo">Murilo</option><option value="Outro">Outro</option></select></div>
+                
+                <div>
+                    <label for="trans-category" class="block text-sm font-medium text-gray-600 mb-1">Categoria</label>
+                    <select id="trans-category" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="Alimentação">Alimentação</option>
+                        <option value="Transporte">Transporte</option>
+                        <option value="Lazer">Lazer</option>
+                        <option value="Moradia">Moradia</option>
+                        <option value="Saúde">Saúde</option>
+                        <option value="Educação">Educação</option>
+                        <option value="Salário">Salário</option>
+                        <option value="Depósito">Depósito</option>
+                        <option value="Investimentos">Investimentos</option>
+                        <option value="Pagamento Fatura">Pagamento Fatura</option> <option value="Outros">Outros</option>
+                    </select>
+                </div>
+                <div><label for="trans-type" class="block text-sm font-medium text-gray-600 mb-1">Tipo</label><select id="trans-type" required class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="entry">Entrada (Débito)</option><option value="debit">Saída (Débito)</option><option value="credit">Crédito</option></select></div><div id="installments-group" class="hidden"><label for="trans-installments" class="block text-sm font-medium text-gray-600 mb-1">Nº de Parcelas (valor total)</label><input type="number" id="trans-installments" value="1" min="1" class="w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div><button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg">Adicionar</button></form></div>
             </div>
-             <!-- Coluna Direita: Gráficos e Extratos -->
-            <div class="lg:col-span-3 flex flex-col gap-8">
-                 <!-- Gráfico de Gastos por Usuário -->
-                <div class="bg-white p-6 rounded-xl shadow-md fade-in">
+             <div class="lg:col-span-3 flex flex-col gap-8">
+                 <div class="bg-white p-6 rounded-xl shadow-md fade-in">
                     <h2 class="text-xl font-bold mb-4 text-gray-700">Gastos por Usuário</h2>
                     <div class="relative h-64">
                          <canvas id="user-chart"></canvas>
                     </div>
                 </div>
-                <!-- Gráfico de Gastos por Categoria -->
                 <div class="bg-white p-6 rounded-xl shadow-md fade-in">
                     <h2 class="text-xl font-bold mb-4 text-gray-700">Gastos por Categoria</h2>
                     <div class="relative h-64">
@@ -114,7 +127,6 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmação de Exclusão -->
     <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden modal-overlay">
         <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md modal-animation">
             <h3 class="text-2xl font-bold text-gray-800 mb-4">Confirmar Exclusão</h3>
@@ -133,7 +145,7 @@
             const yearSelect = document.getElementById('year-select');
             const initialBalanceInput = document.getElementById('initial-balance');
             const creditLimitInput = document.getElementById('credit-limit');
-            const creditClosingDayInput = document.getElementById('credit-closing-day'); // Novo elemento
+            const creditClosingDayInput = document.getElementById('credit-closing-day');
             const transactionForm = document.getElementById('transaction-form');
             const transTypeSelect = document.getElementById('trans-type');
             const installmentsGroup = document.getElementById('installments-group');
@@ -142,13 +154,14 @@
             const deleteModal = document.getElementById('delete-modal');
             const cancelDeleteBtn = document.getElementById('cancel-delete');
             const confirmDeleteBtn = document.getElementById('confirm-delete');
-            // Elementos do tema removidos
-
+            const payBillBtn = document.getElementById('pay-bill-btn');
+            
             const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
             let appData = { transactions: [], monthlySettings: {} };
             let transactionToDelete = null;
             let userChart = null;
             let categoryChart = null;
+            let currentBillAmount = 0;
 
             const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
             const getCurrentPeriodKey = () => `${yearSelect.value}-${monthSelect.value}`;
@@ -182,12 +195,12 @@
                 const month = parseInt(monthSelect.value);
                 
                 if (!appData.monthlySettings[periodKey]) {
-                    appData.monthlySettings[periodKey] = { initialBalance: 0, creditLimit: 0, closingDay: 0 }; // Adicionado closingDay
+                    appData.monthlySettings[periodKey] = { initialBalance: 0, creditLimit: 0, closingDay: 0 };
                 }
                 const settings = appData.monthlySettings[periodKey];
                 initialBalanceInput.value = settings.initialBalance > 0 ? settings.initialBalance : '';
                 creditLimitInput.value = settings.creditLimit > 0 ? settings.creditLimit : '';
-                creditClosingDayInput.value = settings.closingDay > 0 ? settings.closingDay : ''; // Define o valor do novo input
+                creditClosingDayInput.value = settings.closingDay > 0 ? settings.closingDay : '';
 
                 renderTransactions(year, month);
                 calculateAndRenderSummary(year, month);
@@ -202,11 +215,9 @@
                 debitList.innerHTML = '';
                 creditList.innerHTML = '';
 
-                // CORREÇÃO: Puxar o closingDay do mês atual para usar em todos os cálculos
-                const periodKey = `${year}-${month}`;
-                const settings = appData.monthlySettings[periodKey] || { closingDay: 0 };
-                const currentClosingDay = settings.closingDay;
-
+                // NOTA: Esta função usa a lógica de fechamento correta (do mês da compra)
+                // para exibir as parcelas do mês ATUAL.
+                
                 const debitTransactionsThisMonth = appData.transactions.filter(t => {
                     const tDate = new Date(t.date + 'T00:00:00');
                     return (t.type === 'debit' || t.type === 'entry') && tDate.getFullYear() === year && tDate.getMonth() === month;
@@ -216,13 +227,16 @@
                 appData.transactions.filter(t => t.type === 'credit').forEach(t => {
                     const purchaseDate = new Date(t.date + 'T00:00:00');
                     const purchaseDay = purchaseDate.getDate();
+                    const purchaseMonth = purchaseDate.getMonth();
+                    const purchaseYear = purchaseDate.getFullYear();
                     
-                    // Lógica do dia de fechamento (CORRIGIDA)
-                    // Usa a configuração do mês atual para todas as transações
-                    const closingDay = currentClosingDay;
+                    // Pega o closingDay do MÊS DA COMPRA
+                    const purchasePeriodKey = `${purchaseYear}-${purchaseMonth}`;
+                    const purchaseMonthSettings = appData.monthlySettings[purchasePeriodKey] || { closingDay: 0 };
+                    const closingDay = purchaseMonthSettings.closingDay;
                     
-                    let firstBillMonth = purchaseDate.getMonth();
-                    let firstBillYear = purchaseDate.getFullYear();
+                    let firstBillMonth = purchaseMonth;
+                    let firstBillYear = purchaseYear;
 
                     if (closingDay > 0 && purchaseDay > closingDay) {
                         firstBillMonth += 1;
@@ -231,11 +245,11 @@
                             firstBillYear += 1;
                         }
                     }
-                    // Fim da lógica
 
                     const installmentValue = t.value / t.installments.total;
                     for (let i = 0; i < t.installments.total; i++) {
-                        const installmentDate = new Date(firstBillYear, firstBillMonth + i, 1); // Baseado no primeiro mês da fatura
+                        const installmentDate = new Date(firstBillYear, firstBillMonth + i, 1);
+                        // Verifica se a parcela cai no mês que estamos visualizando
                         if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) {
                             creditInstallmentsThisMonth.push({ ...t, installmentValue, description: `${t.description} (${i + 1}/${t.installments.total})` });
                         }
@@ -279,10 +293,10 @@
                 return element;
             };
 
+            // --- *** FUNÇÃO PRINCIPAL CORRIGIDA *** ---
             const calculateAndRenderSummary = (year, month) => {
                 const periodKey = `${year}-${month}`;
                 const settings = appData.monthlySettings[periodKey] || { initialBalance: 0, creditLimit: 0, closingDay: 0 };
-                const currentClosingDay = settings.closingDay; // Pega o dia de fechamento do mês ATUAL
                 
                 const debitTotal = appData.transactions.filter(t => { const tDate = new Date(t.date + 'T00:00:00'); return t.type === 'debit' && tDate.getFullYear() === year && tDate.getMonth() === month; }).reduce((sum, t) => sum + t.value, 0);
                 const entryTotal = appData.transactions.filter(t => { const tDate = new Date(t.date + 'T00:00:00'); return t.type === 'entry' && tDate.getFullYear() === year && tDate.getMonth() === month; }).reduce((sum, t) => sum + t.value, 0);
@@ -291,17 +305,23 @@
                 document.getElementById('final-balance').textContent = formatCurrency(finalBalance);
                 document.getElementById('debit-summary').innerHTML = `<span class="text-green-600">Entradas: ${formatCurrency(entryTotal)}</span> &bull; <span class="text-red-600">Saídas: ${formatCurrency(debitTotal)}</span>`;
 
-                let currentBill = 0; let totalCommitted = 0;
+                let currentBill = 0; 
+                let totalCommitted = 0; // Este é o "Limite Comprometido"
+                const currentDate = new Date(year, month, 1); // Início do mês atual
+
                 appData.transactions.filter(t => t.type === 'credit').forEach(t => {
                     const purchaseDate = new Date(t.date + 'T00:00:00');
                     const purchaseDay = purchaseDate.getDate();
+                    const purchaseMonth = purchaseDate.getMonth();
+                    const purchaseYear = purchaseDate.getFullYear();
 
-                    // Lógica do dia de fechamento (CORRIGIDA)
-                    // Usa a configuração do mês atual para todas as transações
-                    const closingDay = currentClosingDay;
+                    // Pega o closingDay do MÊS DA COMPRA
+                    const purchasePeriodKey = `${purchaseYear}-${purchaseMonth}`;
+                    const purchaseMonthSettings = appData.monthlySettings[purchasePeriodKey] || { closingDay: 0 };
+                    const closingDay = purchaseMonthSettings.closingDay;
                     
-                    let firstBillMonth = purchaseDate.getMonth();
-                    let firstBillYear = purchaseDate.getFullYear();
+                    let firstBillMonth = purchaseMonth;
+                    let firstBillYear = purchaseYear;
 
                     if (closingDay > 0 && purchaseDay > closingDay) {
                         firstBillMonth += 1;
@@ -310,77 +330,97 @@
                             firstBillYear += 1;
                         }
                     }
-                    // Fim da lógica
 
-                    const lastInstallmentDate = new Date(firstBillYear, firstBillMonth + t.installments.total - 1, 1);
-                    if(lastInstallmentDate >= new Date(year, month, 1)) { totalCommitted += t.value; }
-                    
+                    // --- **LÓGICA DO LIMITE CORRIGIDA** ---
+                    const installmentValue = t.value / t.installments.total;
+
                     for (let i = 0; i < t.installments.total; i++) {
                         const installmentDate = new Date(firstBillYear, firstBillMonth + i, 1);
-                        if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) { currentBill += t.value / t.installments.total; }
+
+                        // 1. Calcula a Fatura Atual (currentBill)
+                        // Se a parcela cai neste mês
+                        if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) {
+                            currentBill += installmentValue;
+                        }
+                        
+                        // 2. Calcula o Limite Comprometido (totalCommitted)
+                        // Se a parcela é deste mês ou de um mês futuro
+                        if (installmentDate >= currentDate) {
+                            totalCommitted += installmentValue;
+                        }
                     }
+                    // --- **FIM DA LÓGICA CORRIGIDA** ---
                 });
+                
                 const limitUsage = settings.creditLimit > 0 ? (totalCommitted / settings.creditLimit) * 100 : 0;
+                
                 document.getElementById('current-bill').textContent = formatCurrency(currentBill);
+
+                currentBillAmount = currentBill; // Armazena o valor para o listener do botão
+                if (currentBillAmount > 0) {
+                    payBillBtn.classList.remove('hidden');
+                } else {
+                    payBillBtn.classList.add('hidden');
+                }
+                feather.replace();
+
                 document.getElementById('credit-summary').textContent = `Limite usado: ${limitUsage.toFixed(1)}%`;
+                // Agora o cálculo (settings.creditLimit - totalCommitted) está correto
                 document.getElementById('remaining-limit').textContent = formatCurrency(settings.creditLimit - totalCommitted);
                 document.getElementById('total-spent-month').textContent = formatCurrency(debitTotal + currentBill);
 
-                // Calcular Total Investido (apenas tipo 'debit')
                 const investmentTotal = appData.transactions.filter(t => {
                     const tDate = new Date(t.date + 'T00:00:00');
                     return t.type === 'debit' && t.category === 'Investimentos' && tDate.getFullYear() === year && tDate.getMonth() === month;
                 }).reduce((sum, t) => sum + t.value, 0);
                 document.getElementById('total-invested').textContent = formatCurrency(investmentTotal);
             };
+            // --- **FIM DA FUNÇÃO CORRIGIDA** ---
+
 
             const getTransactionsInMonth = (year, month) => {
-                 // Retorna um array de transações e parcelas que contam para os gráficos
                  let transactions = [];
-                 
-                 // CORREÇÃO: Puxar o closingDay do mês atual para usar em todos os cálculos
-                 const periodKey = `${year}-${month}`;
-                 const settings = appData.monthlySettings[periodKey] || { closingDay: 0 };
-                 const currentClosingDay = settings.closingDay;
 
                  appData.transactions.forEach(t => {
-                    const purchaseDate = new Date(t.date + 'T00:00:00');
+                     const purchaseDate = new Date(t.date + 'T00:00:00');
 
-                    if (t.type === 'debit' || t.type === 'entry') {
-                        if (purchaseDate.getFullYear() === year && purchaseDate.getMonth() === month) {
-                            transactions.push(t);
-                        }
-                    } else if (t.type === 'credit') {
-                        // Lógica do dia de fechamento (CORRIGIDA)
-                        const purchaseDay = purchaseDate.getDate();
-                        const closingDay = currentClosingDay;
-                        
-                        let firstBillMonth = purchaseDate.getMonth();
-                        let firstBillYear = purchaseDate.getFullYear();
+                     if (t.type === 'debit' || t.type === 'entry') {
+                         if (purchaseDate.getFullYear() === year && purchaseDate.getMonth() === month) {
+                             transactions.push(t);
+                         }
+                     } else if (t.type === 'credit') {
+                         const purchaseDay = purchaseDate.getDate();
+                         const purchaseMonth = purchaseDate.getMonth();
+                         const purchaseYear = purchaseDate.getFullYear();
 
-                        if (closingDay > 0 && purchaseDay > closingDay) {
-                            firstBillMonth += 1;
-                            if (firstBillMonth > 11) {
-                                firstBillMonth = 0;
-                                firstBillYear += 1;
-                            }
-                        }
-                        // Fim da lógica
-                        
-                        const installmentValue = t.value / t.installments.total;
-                        
-                        for (let i = 0; i < t.installments.total; i++) {
-                            const installmentDate = new Date(firstBillYear, firstBillMonth + i, 1);
-                            if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) {
-                                // Adiciona um objeto representando a parcela
-                                transactions.push({
-                                    ...t,
-                                    value: installmentValue, // Usa o valor da parcela
-                                    type: 'credit_installment' // Tipo especial para o gráfico
-                                });
-                            }
-                        }
-                    }
+                         const purchasePeriodKey = `${purchaseYear}-${purchaseMonth}`;
+                         const purchaseMonthSettings = appData.monthlySettings[purchasePeriodKey] || { closingDay: 0 };
+                         const closingDay = purchaseMonthSettings.closingDay;
+                         
+                         let firstBillMonth = purchaseMonth;
+                         let firstBillYear = purchaseYear;
+
+                         if (closingDay > 0 && purchaseDay > closingDay) {
+                             firstBillMonth += 1;
+                             if (firstBillMonth > 11) {
+                                 firstBillMonth = 0;
+                                 firstBillYear += 1;
+                             }
+                         }
+                         
+                         const installmentValue = t.value / t.installments.total;
+                         
+                         for (let i = 0; i < t.installments.total; i++) {
+                             const installmentDate = new Date(firstBillYear, firstBillMonth + i, 1);
+                             if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) {
+                                 transactions.push({
+                                     ...t,
+                                     value: installmentValue,
+                                     type: 'credit_installment'
+                                 });
+                             }
+                         }
+                     }
                  });
                  return transactions;
             };
@@ -401,20 +441,18 @@
             
             const drawEmptyChartMessage = (ctx, message) => {
                  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                ctx.font = "16px 'Inter', sans-serif";
-                ctx.fillStyle = "#9ca3af"; // Cor fixa (gray-400)
-                ctx.textAlign = "center";
-                ctx.fillText(message, ctx.canvas.width / 2, ctx.canvas.height / 2);
+                 ctx.font = "16px 'Inter', sans-serif";
+                 ctx.fillStyle = "#9ca3af"; // Cor fixa (gray-400)
+                 ctx.textAlign = "center";
+                 ctx.fillText(message, ctx.canvas.width / 2, ctx.canvas.height / 2);
             };
 
             const updateUserChart = (year, month) => {
                 const transactionsInMonth = getTransactionsInMonth(year, month);
                 const spendingByUser = transactionsInMonth.reduce((acc, t) => {
                     let value = t.value;
-                    // Apenas gastos (saída débito ou parcela de crédito)
                     if (t.type === 'debit' || t.type === 'credit_installment') {
-                        // CORREÇÃO: Excluir categorias que não são "gastos"
-                        if (['Salário', 'Depósito', 'Investimentos'].includes(t.category)) {
+                        if (['Salário', 'Depósito', 'Investimentos', 'Pagamento Fatura'].includes(t.category)) {
                             return acc;
                         }
                         acc[t.user] = (acc[t.user] || 0) + value;
@@ -447,16 +485,12 @@
                 const transactionsInMonth = getTransactionsInMonth(year, month);
                 const spendingByCategory = transactionsInMonth.reduce((acc, t) => {
                     let value = t.value;
-                    // Apenas gastos (saída débito ou parcela de crédito)
                     if (t.type !== 'debit' && t.type !== 'credit_installment') {
                         return acc;
                     }
-                    
-                    // Excluir categorias que não são "gastos" (Entradas ou Investimentos)
-                    if (['Salário', 'Depósito', 'Investimentos'].includes(t.category)) {
+                    if (['Salário', 'Depósito', 'Investimentos', 'Pagamento Fatura'].includes(t.category)) {
                         return acc;
                     }
-
                     acc[t.category] = (acc[t.category] || 0) + value;
                     return acc;
                 }, {});
@@ -486,12 +520,6 @@
                 const year = parseInt(yearSelect.value);
                 const month = parseInt(monthSelect.value);
                 
-                // CORREÇÃO: Puxar o closingDay do mês atual para usar em todos os cálculos
-                const periodKey = `${year}-${month}`;
-                const settings = appData.monthlySettings[periodKey] || { closingDay: 0 };
-                const currentClosingDay = settings.closingDay;
-
-                // Correção: Usar ; como delimitador e adicionar BOM \uFEFF para Excel
                 const headers = 'Data;Descrição;Usuário;Categoria;Tipo;Valor;Parcela\n';
                 let rows = '';
                 
@@ -500,39 +528,40 @@
                     
                     if(t.type === 'debit' || t.type === 'entry') {
                          if(purchaseDate.getFullYear() === year && purchaseDate.getMonth() === month) {
-                            const typeStr = t.type === 'entry' ? "Entrada (Débito)" : "Saída (Débito)";
-                            rows += `"${t.date}";"${t.description}";"${t.user}";"${t.category}";"${typeStr}";"${t.value.toFixed(2).replace('.',',')}";"1/1"\n`;
+                             const typeStr = t.type === 'entry' ? "Entrada (Débito)" : "Saída (Débito)";
+                             rows += `"${t.date}";"${t.description}";"${t.user}";"${t.category}";"${typeStr}";"${t.value.toFixed(2).replace('.',',')}";"1/1"\n`;
                          }
                     } else { // credit
-                        // Correção: Adicionar lógica do dia de fechamento (CORRIGIDA)
-                        const purchaseDay = purchaseDate.getDate();
-                        const closingDay = currentClosingDay;
-                        
-                        let firstBillMonth = purchaseDate.getMonth();
-                        let firstBillYear = purchaseDate.getFullYear();
+                         const purchaseDay = purchaseDate.getDate();
+                         const purchaseMonth = purchaseDate.getMonth();
+                         const purchaseYear = purchaseDate.getFullYear();
 
-                        if (closingDay > 0 && purchaseDay > closingDay) {
-                            firstBillMonth += 1;
-                            if (firstBillMonth > 11) {
-                                firstBillMonth = 0;
-                                firstBillYear += 1;
-                            }
-                        }
-                        // Fim da correção
-                        
-                        const installmentValue = t.value / t.installments.total;
-                        
-                        for (let i = 0; i < t.installments.total; i++) {
-                            const installmentDate = new Date(firstBillYear, firstBillMonth + i, 1);
-                            if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) {
-                                // Correção: Usar data da compra (t.date) e ;
-                                rows += `"${t.date}";"${t.description}";"${t.user}";"${t.category}";"Crédito";"${installmentValue.toFixed(2).replace('.',',')}";"${i+1}/${t.installments.total}"\n`;
-                            }
-                        }
+                         const purchasePeriodKey = `${purchaseYear}-${purchaseMonth}`;
+                         const purchaseMonthSettings = appData.monthlySettings[purchasePeriodKey] || { closingDay: 0 };
+                         const closingDay = purchaseMonthSettings.closingDay;
+                         
+                         let firstBillMonth = purchaseMonth;
+                         let firstBillYear = purchaseYear;
+
+                         if (closingDay > 0 && purchaseDay > closingDay) {
+                             firstBillMonth += 1;
+                             if (firstBillMonth > 11) {
+                                 firstBillMonth = 0;
+                                 firstBillYear += 1;
+                             }
+                         }
+                         
+                         const installmentValue = t.value / t.installments.total;
+                         
+                         for (let i = 0; i < t.installments.total; i++) {
+                             const installmentDate = new Date(firstBillYear, firstBillMonth + i, 1);
+                             if (installmentDate.getFullYear() === year && installmentDate.getMonth() === month) {
+                                 rows += `"${t.date}";"${t.description}";"${t.user}";"${t.category}";"Crédito";"${installmentValue.toFixed(2).replace('.',',')}";"${i+1}/${t.installments.total}"\n`;
+                             }
+                         }
                     }
                 });
 
-                // Correção: Adicionar BOM \uFEFF para Excel ler UTF-8 corretamente
                 const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent('\uFEFF' + headers + rows);
                 const encodedUri = csvContent;
                 const link = document.createElement("a");
@@ -552,15 +581,12 @@
                 deleteModal.classList.add('hidden');
             };
 
-            // --- Lógica do Tema Escuro Removida ---
-
-
             // Event Listeners
             monthSelect.addEventListener('change', renderUI);
             yearSelect.addEventListener('change', renderUI);
             initialBalanceInput.addEventListener('change', (e) => { appData.monthlySettings[getCurrentPeriodKey()].initialBalance = parseFloat(e.target.value) || 0; saveData(); renderUI(); });
             creditLimitInput.addEventListener('change', (e) => { appData.monthlySettings[getCurrentPeriodKey()].creditLimit = parseFloat(e.target.value) || 0; saveData(); renderUI(); });
-            creditClosingDayInput.addEventListener('change', (e) => { appData.monthlySettings[getCurrentPeriodKey()].closingDay = parseInt(e.target.value) || 0; saveData(); renderUI(); }); // Novo Event Listener
+            creditClosingDayInput.addEventListener('change', (e) => { appData.monthlySettings[getCurrentPeriodKey()].closingDay = parseInt(e.target.value) || 0; saveData(); renderUI(); });
             transTypeSelect.addEventListener('change', (e) => installmentsGroup.classList.toggle('hidden', e.target.value !== 'credit'));
             transactionForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -577,8 +603,47 @@
             cancelDeleteBtn.addEventListener('click', closeDeleteModal);
             deleteModal.addEventListener('click', (e) => { if(e.target === deleteModal) closeDeleteModal(); });
             
+            payBillBtn.addEventListener('click', () => {
+                if (currentBillAmount <= 0) {
+                    alert("Não há fatura a ser paga.");
+                    return;
+                }
+
+                const paymentDate = transDateInput.value; 
+                const paymentDateObj = new Date(paymentDate + 'T00:00:00');
+                const paymentMonth = paymentDateObj.getMonth();
+                const paymentYear = paymentDateObj.getFullYear();
+                
+                const selectedMonth = parseInt(monthSelect.value);
+                const selectedYear = parseInt(yearSelect.value);
+
+                let confirmMsg = `Deseja lançar o pagamento da fatura de ${formatCurrency(currentBillAmount)} como um débito na data ${paymentDateObj.toLocaleDateString('pt-BR')}?`;
+
+                if (paymentMonth !== selectedMonth || paymentYear !== selectedYear) {
+                    confirmMsg += `\n\nAVISO: A data selecionada (${paymentDateObj.toLocaleDateString('pt-BR')}) pertence a um mês diferente do que você está visualizando (${monthNames[selectedMonth]}/${selectedYear}). O débito será lançado no mês de ${monthNames[paymentMonth]}.`;
+                }
+
+                if (confirm(confirmMsg)) {
+                    const billPaymentTransaction = {
+                        id: crypto.randomUUID(),
+                        description: `Pagamento Fatura (${monthNames[selectedMonth]}/${selectedYear})`,
+                        value: currentBillAmount,
+                        date: paymentDate, 
+                        user: 'Outro',
+                        category: 'Pagamento Fatura',
+                        type: 'debit',
+                        installments: { total: 1 }
+                    };
+                    
+                    appData.transactions.push(billPaymentTransaction);
+                    saveData();
+                    renderUI();
+                    
+                    alert('Pagamento da fatura lançado com sucesso no débito!');
+                }
+            });
+
             const init = () => {
-                // applyTheme(); // Chamada removida
                 populateSelectors();
                 loadData();
                 renderUI();
